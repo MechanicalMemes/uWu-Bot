@@ -30,8 +30,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
-import com.disnodeteam.dogecv.detectors.MineralRowDetector;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.disnodeteam.dogecv.DogeCV;
+import com.disnodeteam.dogecv.detectors.roverrukus.SamplingOrderDetector;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -56,17 +56,17 @@ public class MineralRowTestOpMode extends OpMode
 {
 
     private ElapsedTime runtime = new ElapsedTime();
-    private MineralRowDetector mineralRowDetector = null;
+    private SamplingOrderDetector mineralRowDetector = null;
 
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
-        mineralRowDetector = new MineralRowDetector();
+        mineralRowDetector = new SamplingOrderDetector();
         mineralRowDetector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
 
         //Jewel Detector Settings
         mineralRowDetector.areaWeight = 0.02;
-        mineralRowDetector.detectionMode = MineralRowDetector.MineralRowDetectionMode.MAX_AREA; // PERFECT_AREA
+        mineralRowDetector.detectionMode = DogeCV.AreaScoringMethod.MAX_AREA;// PERFECT_AREA
         //jewelDetector.perfectArea = 6500; <- Needed for PERFECT_AREA
         mineralRowDetector.debugContours = true;
         mineralRowDetector.maxDiffrence = 15;
