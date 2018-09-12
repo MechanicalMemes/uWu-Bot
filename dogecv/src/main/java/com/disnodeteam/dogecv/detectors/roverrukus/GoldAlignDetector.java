@@ -172,6 +172,8 @@ public class GoldAlignDetector extends OpenCVPipeline {
                 aligned = false;
             }
             Imgproc.line(workingMat,new Point(xPos, newSize.height), new Point(xPos, newSize.height - 30),new Scalar(255,255,0), 2);
+
+
         }else{
             aligned = false;
         }
