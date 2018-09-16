@@ -28,7 +28,7 @@
  */
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -65,8 +65,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  * is explained in {@link ConceptVuforiaNavigation}.
  */
 
-@Autonomous(name="Concept: VuMark Id", group ="Concept")
-
+@TeleOp(name="Concept: VuMark Id", group ="Concept")
+@Disabled
 public class ConceptVuMarkIdentification extends LinearOpMode {
 
     public static final String TAG = "Vuforia VuMark Sample";
@@ -83,7 +83,6 @@ public class ConceptVuMarkIdentification extends LinearOpMode {
 
         /*
          * To start up Vuforia, tell it the view that we wish to use for camera monitor (on the RC phone);
-         * If no camera monitor is desired, use the parameterless constructor instead (commented out below).
          */
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
@@ -101,9 +100,9 @@ public class ConceptVuMarkIdentification extends LinearOpMode {
          * random data. As an example, here is a example of a fragment of a valid key:
          *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
          * Once you've obtained a license key, copy the string from the Vuforia web site
-         * and paste it in to your code onthe next line, between the double quotes.
+         * and paste it in to your code on the next line, between the double quotes.
          */
-        parameters.vuforiaLicenseKey = "AWbfTmn/////AAABmY0xuIe3C0RHvL3XuzRxyEmOT2OekXBSbqN2jot1si3OGBObwWadfitJR/D6Vk8VEBiW0HG2Q8UAEd0//OliF9aWCRmyDJ1mMqKCJZxpZemfT5ELFuWnJIZWUkKyjQfDNe2RIaAh0ermSxF4Bq77IDFirgggdYJoRIyi2Ys7Gl9lD/tSonV8OnldIN/Ove4/MtEBJTKHqjUEjC5U2khV+26AqkeqbxhFTNiIMl0LcmSSfugGhmWFGFtuPtp/+flPBRGoBO+tSl9P2sV4mSUBE/WrpHqB0Jd/tAmeNvbtgQXtZEGYc/9NszwRLVNl9k13vrBcgsiNxs2UY5xAvA4Wb6LN7Yu+tChwc+qBiVKAQe09";
+        parameters.vuforiaLicenseKey = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
 
         /*
          * We also indicate which camera on the RC that we wish to use.
@@ -111,7 +110,12 @@ public class ConceptVuMarkIdentification extends LinearOpMode {
          * for a competition robot, the front camera might be more convenient.
          */
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+
+        /**
+         * Instantiate the Vuforia engine
+         */
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
 
         /**
          * Load the data set containing the VuMarks for Relic Recovery. There's only one trackable

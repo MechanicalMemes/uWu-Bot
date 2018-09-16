@@ -35,6 +35,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSequenceId;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureSession;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.camera.WebcamExample;
+
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -56,10 +62,11 @@ public class LineTestOpMode extends OpMode
 
     private ElapsedTime runtime = new ElapsedTime();
     private TestLineDetector detector = null;
+    private Camera camer;
 
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
+
         detector = new TestLineDetector();
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
         detector.enable();

@@ -1,6 +1,7 @@
 package com.disnodeteam.dogecv.filters;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -68,12 +69,16 @@ public class LeviColorFilter extends DogeCVColorFilter {
                 Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2YUV);
                 Imgproc.GaussianBlur(input,input,new Size(3,3),0);
                 Core.split(input, channels);
-                Imgproc.threshold(channels.get(1), mask, threshold, 255, Imgproc.THRESH_BINARY_INV);
+                if(channels.size() > 0){
+                    Imgproc.threshold(channels.get(1), mask, threshold, 255, Imgproc.THRESH_BINARY_INV);
+                }
+
                 break;
         }
 
         for(int i=0;i<channels.size();i++){
-            channels.get(i).release();
+
+          channels.get(i).release();
         }
 
         input.release();

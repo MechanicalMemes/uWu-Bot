@@ -58,6 +58,7 @@ public class GoldDetectOpMode extends OpMode
     private ElapsedTime runtime = new ElapsedTime();
     private GoldDetector detector = null;
 
+
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");

@@ -11,6 +11,6 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 dependencies {
-    compile project(':dogecv')
-    compile project(':openCVLibrary3')
+    implementation project(':DogeCV')
+    implementation project(':openCVLibrary3')
 }

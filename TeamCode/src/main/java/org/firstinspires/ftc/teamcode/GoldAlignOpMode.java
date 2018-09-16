@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
+import com.disnodeteam.dogecv.detectors.roverrukus.SamplingOrderDetector;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -56,25 +57,17 @@ public class GoldAlignOpMode extends OpMode
 
     private ElapsedTime runtime = new ElapsedTime();
     private GoldAlignDetector detector = null;
-
+    private SamplingOrderDetector detector2 = null;
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
         detector = new GoldAlignDetector();
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
-
-        //Jewel Detector Settings
-        detector.areaWeight = 0.02;
-        detector.detectionMode = GoldAlignDetector.MineralRowDetectionMode.MAX_AREA; // PERFECT_AREA
-        //jewelDetector.perfectArea = 6500; <- Needed for PERFECT_AREA
-        detector.debugContours = true;
-        detector.maxDiffrence = 15;
-        detector.ratioWeight = 15;
-        detector.minArea = 700;
-
         detector.enable();
 
-
+        detector2 = new SamplingOrderDetector();
+        detector2.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
+        detector2.enable();
     }
 
     @Override

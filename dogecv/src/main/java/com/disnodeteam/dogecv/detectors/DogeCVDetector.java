@@ -1,9 +1,14 @@
 package com.disnodeteam.dogecv.detectors;
 
+import android.app.Activity;
+import android.view.Surface;
+import android.view.View;
+
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.OpenCVPipeline;
 import com.disnodeteam.dogecv.scoring.DogeCVScorer;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Size;
@@ -17,6 +22,7 @@ import java.util.List;
  */
 
 public abstract class DogeCVDetector extends OpenCVPipeline{
+
     public abstract Mat process(Mat input);
     public abstract void useDefaults();
 
@@ -48,16 +54,22 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
         return totalScore;
     }
 
+
+
     @Override
     public Mat processFrame(Mat rgba, Mat gray) {
         initSize= rgba.size();
+
+
+
         adjustedSize = new Size(initSize.width * downscale, initSize.height * downscale);
         rgba.copyTo(workingMat);
-
+        
 
         Imgproc.resize(workingMat, workingMat,adjustedSize);
 
-        return process(workingMat);
+        Imgproc.resize(process(workingMat),workingMat,initSize);
+        return workingMat;
     }
 
     public Size getInitSize() {
