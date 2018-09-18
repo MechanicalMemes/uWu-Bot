@@ -15,3 +15,13 @@ dependencies {
     implementation project(':openCVLibrary3')
     implementation project(':DogeCommander')
 }
+
+repositories {
+    // other repositories
+    jcenter()
+}
+
+dependencies {
+    // other dependencies
+    compile 'com.acmerobotics.roadrunner:core:0.2.0'
+}
