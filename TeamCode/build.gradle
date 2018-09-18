@@ -19,9 +19,12 @@ dependencies {
 repositories {
     // other repositories
     jcenter()
+    google()
 }
 
 dependencies {
     // other dependencies
     compile 'com.acmerobotics.roadrunner:core:0.2.0'
+    compile 'com.android.support:multidex:1.0.3'
+
 }
