@@ -150,7 +150,6 @@ public class Dogeforia extends VuforiaLocalizerImpl {
                 @Override public void accept(Frame frame)
                 {
                     processFrame(frame);
-
                 }
             }));
         }

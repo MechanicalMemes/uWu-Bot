@@ -27,18 +27,9 @@ public class RatioScorer extends DogeCVScorer{
     @Override
     public double calculateDifference(MatOfPoint contours) {
         double score = Double.MAX_VALUE;
-        MatOfPoint2f approxCurve = new MatOfPoint2f();
-        MatOfPoint2f contour2f = new MatOfPoint2f(contours.toArray());
-
-        //Processing on mMOP2f1 which is in type MatOfPoint2f
-        double approxDistance = Imgproc.arcLength(contour2f, true) * 0.02;
-        Imgproc.approxPolyDP(contour2f, approxCurve, approxDistance, true);
-
-        //Convert back to MatOfPoint
-        MatOfPoint points = new MatOfPoint(approxCurve.toArray());
 
         // Get bounding rect of contour
-        Rect rect = Imgproc.boundingRect(points);
+        Rect rect = Imgproc.boundingRect(contours);
         double x = rect.x;
         double y = rect.y;
         double w = rect.width;

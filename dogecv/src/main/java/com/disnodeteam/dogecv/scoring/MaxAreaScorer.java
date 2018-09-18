@@ -26,7 +26,7 @@ public class MaxAreaScorer extends DogeCVScorer{
 
         double normalizedArea = (max - area) / max;
 
-        return normalizedArea * weight;
+        return -area * weight;
     }
 
 }

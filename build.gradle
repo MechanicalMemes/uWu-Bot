@@ -14,7 +14,3 @@ buildscript {
 }
 
 
-
-repositories {
-    google()
-}

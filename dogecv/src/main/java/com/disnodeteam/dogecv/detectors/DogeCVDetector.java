@@ -29,7 +29,8 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
     private List<DogeCVScorer> scorers = new ArrayList<>();
     private Size initSize;
     private Size adjustedSize;
-    private Mat workingMat = new Mat();;
+    private Mat workingMat = new Mat();
+    public double maxDiffrence = 10;
 
     public DogeCV.DetectionSpeed speed = DogeCV.DetectionSpeed.BALANCED;
     public double downscale = 0.5;

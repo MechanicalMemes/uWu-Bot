@@ -77,8 +77,7 @@ public class LeviColorFilter extends DogeCVColorFilter {
         }
 
         for(int i=0;i<channels.size();i++){
-
-          channels.get(i).release();
+            channels.get(i).release();
         }
 
         input.release();

@@ -1,11 +1,14 @@
 package com.disnodeteam.dogecv.detectors.roverrukus;
 
+import android.util.Log;
 
 import com.disnodeteam.dogecv.DogeCV;
-import com.disnodeteam.dogecv.OpenCVPipeline;
+import com.disnodeteam.dogecv.detectors.DogeCVDetector;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
 import com.disnodeteam.dogecv.filters.HSVColorFilter;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
+import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
+import com.disnodeteam.dogecv.scoring.RatioScorer;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -18,17 +21,15 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by Victo on 11/5/2017.
+ * Created by Victo on 9/10/2018.
  */
 
-public class SamplingOrderDetector extends OpenCVPipeline {
+public class SamplingOrderDetector extends DogeCVDetector {
 
-
-    public enum MineralRowLocation {
+    public enum GoldLocation {
         UNKNOWN,
         LEFT,
         CENTER,
@@ -36,73 +37,59 @@ public class SamplingOrderDetector extends OpenCVPipeline {
     }
 
 
-    public DogeCV.AreaScoringMethod detectionMode    =  DogeCV.AreaScoringMethod.MAX_AREA;
-    public double              downScaleFactor  = 0.4;
-    public double              perfectRatio     = 1;
-    public boolean             rotateMat        = false;
-    public DogeCV.DetectionSpeed speed            = DogeCV.DetectionSpeed.BALANCED;
-    public double              perfectArea      = 6500;
-    public double              areaWeight       = 0.01; // Since we're dealing with 100's of pixels
-    public double              minArea          = 1000;
-    public double              ratioWeight      = 100; // Since most of the time the area diffrence is a decimal place
-    public double              maxDiffrence     = 8; // Since most of the time the area diffrence is a decimal place
-    public boolean             debugContours    = false;
-    public boolean             stretch          = true;
+    public DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
 
-    public DogeCVColorFilter   colorFilerYellow   = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW);
-    public DogeCVColorFilter   colorFilterWhite   = new HSVColorFilter(new Scalar(40,25,200), new Scalar(40,40,50));
+    public RatioScorer ratioScorer = new RatioScorer(1.0,10);
+    public MaxAreaScorer maxAreaScorer = new MaxAreaScorer(50000,0.005);
 
 
-    private MineralRowLocation currentOrder = MineralRowLocation.UNKNOWN;
-    private MineralRowLocation lastOrder    = MineralRowLocation.UNKNOWN;
+    public DogeCVColorFilter yellowFilter = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW,70);
+    public DogeCVColorFilter whiteFilter  = new HSVColorFilter(new Scalar(40,25,200), new Scalar(40,40,50));
 
+    private GoldLocation currentOrder = GoldLocation.UNKNOWN;
+    private GoldLocation lastOrder    = GoldLocation.UNKNOWN;
+    private Rect         foundRect    = null;
+    private boolean      isFound      = false;
 
-    private Mat workingMat = new Mat();
+    private Mat workingMat  = new Mat();
     private Mat blurredMat  = new Mat();
-    private Mat maskYellow = new Mat();
-    private Mat maskWhite = new Mat();
-    private Mat hiarchy  = new Mat();
-    private Mat structure = new Mat();
+    private Mat yellowMask  = new Mat();
+    private Mat whiteMask   = new Mat();
+    private Mat hiarchy     = new Mat();
+    private Mat structure   = new Mat();
+
     public Size stretchKernal = new Size(10,10);
     private Size newSize = new Size();
 
     @Override
-    public Mat processFrame(Mat rgba, Mat gray) {
-
-        Size initSize= rgba.size();
-        newSize  = new Size(initSize.width * downScaleFactor, initSize.height * downScaleFactor);
-        rgba.copyTo(workingMat);
-
-        Imgproc.resize(workingMat, workingMat,newSize);
-
-        if(rotateMat){
-            Mat tempBefore = workingMat.t();
-
-            Core.flip(tempBefore, workingMat, -1); //mRgba.t() is the transpose
-
-            tempBefore.release();
+    public Mat process(Mat input) {
+        if(input.channels() < 0 || input.cols() <= 0){
+            Log.e("DogeCV", "Bad INPUT MAT!");
         }
+        input.copyTo(workingMat);
+        input.release();
 
 
-        Mat yellowConvert = workingMat.clone();
-        Mat whiteConvert = workingMat.clone();
+        yellowFilter.process(workingMat.clone(),yellowMask);
+        whiteFilter.process(workingMat.clone(), whiteMask);
 
-        colorFilerYellow.process(yellowConvert, maskYellow);
-        colorFilterWhite.process(whiteConvert, maskWhite);
-        if(stretch){
-            structure = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT,stretchKernal);
-            Imgproc.morphologyEx(maskWhite,maskWhite,Imgproc.MORPH_CLOSE,structure,new Point(-1,-1), 3);
-        }
+
         List<MatOfPoint> contoursYellow = new ArrayList<>();
+        List<MatOfPoint> contoursWhite = new ArrayList<>();
 
-        Imgproc.findContours(maskYellow, contoursYellow, hiarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(yellowMask, contoursYellow, hiarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         Imgproc.drawContours(workingMat,contoursYellow,-1,new Scalar(230,70,70),2);
-        Rect chosenYellowRect = null;
+
+        Imgproc.findContours(whiteMask, contoursWhite, hiarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.drawContours(workingMat,contoursWhite,-1,new Scalar(230,70,70),2);
+
+
+        Rect   chosenYellowRect  = null;
         double chosenYellowScore = Integer.MAX_VALUE;
 
         MatOfPoint2f approxCurve = new MatOfPoint2f();
 
-        for(MatOfPoint c : contoursYellow) {
+        for(MatOfPoint c : contoursYellow){
             MatOfPoint2f contour2f = new MatOfPoint2f(c.toArray());
 
             //Processing on mMOP2f1 which is in type MatOfPoint2f
@@ -115,63 +102,31 @@ public class SamplingOrderDetector extends OpenCVPipeline {
             // Get bounding rect of contour
             Rect rect = Imgproc.boundingRect(points);
 
-            // You can find this by printing the area of each found rect, then looking and finding what u deem to be perfect.
-            // Run this with the bot, on a balance board, with jewels in their desired location. Since jewels should mostly be
-            // in the same position, this hack could work nicely.
+            double diffrenceScore = calculateScore(points);
 
-
-            double area = Imgproc.contourArea(c);
-            double areaDiffrence = 0;
-
-            switch(detectionMode){
-                case MAX_AREA:
-                    areaDiffrence = -area * areaWeight;
-                    break;
-                case PERFECT_AREA:
-                    areaDiffrence = Math.abs(perfectArea - area);
-                    break;
-            }
-
-            // Just declaring vars to make my life eassy
-            double x = rect.x;
-            double y = rect.y;
-            double w = rect.width;
-            double h = rect.height;
-            Point centerPoint = new Point(x + ( w/2), y + (h/2));
-
-
-
-            double cubeRatio = Math.max(Math.abs(h/w), Math.abs(w/h)); // Get the ratio. We use max in case h and w get swapped??? it happens when u account for rotation
-            double ratioDiffrence = Math.abs(cubeRatio - perfectRatio);
-
-
-            double finalDiffrence = (ratioDiffrence * ratioWeight) + (areaDiffrence * areaWeight);
-
-
-            // Optional to ALWAYS return a result.
-
-            // Update the chosen rect if the diffrence is lower then the curreny chosen
-            // Also can add a condition for min diffrence to filter out VERY wrong answers
-            // Think of diffrence as score. 0 = perfect
-            if(finalDiffrence < chosenYellowScore && finalDiffrence < maxDiffrence && area > minArea){
-                chosenYellowScore = finalDiffrence;
+            if(diffrenceScore < chosenYellowScore && diffrenceScore < maxDiffrence ){
+                chosenYellowScore = diffrenceScore;
                 chosenYellowRect = rect;
             }
 
-            if(debugContours && area > 100){
+            double area = Imgproc.contourArea(c);
+            double x = rect.x;
+            double y = rect.y;
+            double w = rect.width;
+            double h = rect.height;
+            Point centerPoint = new Point(x + ( w/2), y + (h/2));
+            if( area > 1000){
                 Imgproc.circle(workingMat,centerPoint,3,new Scalar(0,255,255),3);
                 Imgproc.putText(workingMat,"Area: " + area,centerPoint,0,0.5,new Scalar(0,255,255));
             }
-
         }
 
-        List<MatOfPoint> contoursWhite = new ArrayList<>();
+        List<Rect>   choosenWhiteRect  = new ArrayList<>();
+        List<Double> chosenWhiteScore  = new ArrayList<>();;
 
-        Imgproc.findContours(maskWhite, contoursWhite,hiarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        Imgproc.drawContours(workingMat,contoursWhite,-1,new Scalar(70,130,230),2);
-        List<Rect> whiteFound = new ArrayList<>();
-        List<Double> whiteScores = new ArrayList<>();
-        for(MatOfPoint c : contoursWhite) {
+
+
+        for(MatOfPoint c : contoursWhite){
             MatOfPoint2f contour2f = new MatOfPoint2f(c.toArray());
 
             //Processing on mMOP2f1 which is in type MatOfPoint2f
@@ -184,44 +139,23 @@ public class SamplingOrderDetector extends OpenCVPipeline {
             // Get bounding rect of contour
             Rect rect = Imgproc.boundingRect(points);
 
-            // You can find this by printing the area of each found rect, then looking and finding what u deem to be perfect.
-            // Run this with the bot, on a balance board, with jewels in their desired location. Since jewels should mostly be
-            // in the same position, this hack could work nicely.
-
+            double diffrenceScore = calculateScore(points);
 
             double area = Imgproc.contourArea(c);
-            double areaDiffrence = 0;
-
-            switch(detectionMode){
-                case MAX_AREA:
-                    areaDiffrence = -area * areaWeight;
-                    break;
-                case PERFECT_AREA:
-                    areaDiffrence = Math.abs(perfectArea - area);
-                    break;
-            }
-
-
-            // Just declaring vars to make my life eassy
             double x = rect.x;
             double y = rect.y;
             double w = rect.width;
             double h = rect.height;
             Point centerPoint = new Point(x + ( w/2), y + (h/2));
+            if( area > 1000){
+                Imgproc.circle(workingMat,centerPoint,3,new Scalar(0,255,255),3);
+                Imgproc.putText(workingMat,"Area: " + area,centerPoint,0,0.5,new Scalar(0,255,255));
+                Imgproc.putText(workingMat,"Diff: " + diffrenceScore,new Point(centerPoint.x, centerPoint.y + 20),0,0.5,new Scalar(0,255,255));
+            }
 
-            double cubeRatio = Math.max(Math.abs(h/w), Math.abs(w/h)); // Get the ratio. We use max in case h and w get swapped??? it happens when u account for rotation
-            double ratioDiffrence = Math.abs(cubeRatio - 1);
-
-            double finalDiffrence = (ratioDiffrence * ratioWeight) + (areaDiffrence * areaWeight);
-
-
-
-            // Update the chosen rect if the diffrence is lower then the curreny chosen
-            // Also can add a condition for min diffrence to filter out VERY wrong answers
-            // Think of diffrence as score. 0 = perfect
-            if(finalDiffrence < maxDiffrence && area > minArea){
-                boolean good = true;
-                for(Rect checkRect : whiteFound){
+            boolean good = true;
+            if(diffrenceScore < maxDiffrence && area > 1000){
+                for(Rect checkRect : choosenWhiteRect){
                     boolean inX = ( rect.x > (checkRect.x - (checkRect.width / 2))) && rect.x < (checkRect.x + (checkRect.width / 2));
                     boolean inY = ( rect.y > (checkRect.y - (checkRect.height / 2))) && rect.y < (checkRect.y + (checkRect.height / 2));
                     if(inX && inY){
@@ -229,19 +163,13 @@ public class SamplingOrderDetector extends OpenCVPipeline {
                     }
                 }
                 if(good){
-                    whiteFound.add(rect);
-                    whiteScores.add(finalDiffrence);
+                    choosenWhiteRect.add(rect);
+                    chosenWhiteScore.add(diffrenceScore);
                 }
             }
 
-            if(debugContours && area > 100){
-                Imgproc.circle(workingMat,centerPoint,3,new Scalar(0,255,255),3);
-                Imgproc.putText(workingMat,"Area: " + area,centerPoint,0,0.5,new Scalar(0,255,255));
-            }
 
         }
-
-
 
         if(chosenYellowRect != null){
             Imgproc.rectangle(workingMat,
@@ -256,18 +184,19 @@ public class SamplingOrderDetector extends OpenCVPipeline {
                     1.3,
                     new Scalar(0, 255, 255),
                     2);
+
         }
 
-        if(whiteFound != null){
-            for(int i=0;i<whiteFound.size();i++){
-                Rect rect = whiteFound.get(i);
-                double score = whiteScores.get(i);
+        if(choosenWhiteRect != null){
+            for(int i=0;i<choosenWhiteRect.size();i++){
+                Rect rect = choosenWhiteRect.get(i);
+                double score = chosenWhiteScore.get(i);
                 Imgproc.rectangle(workingMat,
                         new Point(rect.x, rect.y),
                         new Point(rect.x + rect.width, rect.y + rect.height),
                         new Scalar(255, 255, 255), 2);
                 Imgproc.putText(workingMat,
-                        "Silver: " + String.format("%.2f X=%.2f", chosenYellowScore, (double)rect.x),
+                        "Silver: " + String.format("Score %.2f ", score) ,
                         new Point(rect.x - 5, rect.y - 10),
                         Core.FONT_HERSHEY_PLAIN,
                         1.3,
@@ -277,51 +206,55 @@ public class SamplingOrderDetector extends OpenCVPipeline {
             }
         }
 
-
-        if(whiteFound.size() >= 2 && chosenYellowRect != null){
+        if(choosenWhiteRect.size() >= 2 && chosenYellowRect != null){
             int leftCount = 0;
-            for(int i=0;i<whiteFound.size();i++){
-                Rect rect = whiteFound.get(i);
+            for(int i=0;i<choosenWhiteRect.size();i++){
+                Rect rect = choosenWhiteRect.get(i);
                 if(chosenYellowRect.x > rect.x){
                     leftCount++;
                 }
             }
             if(leftCount == 0){
-                currentOrder = MineralRowLocation.LEFT;
+                currentOrder = SamplingOrderDetector.GoldLocation.LEFT;
             }
 
             if(leftCount == 1){
-                currentOrder = MineralRowLocation.CENTER;
+                currentOrder = SamplingOrderDetector.GoldLocation.CENTER;
             }
 
             if(leftCount >= 2){
-                currentOrder = MineralRowLocation.RIGHT;
+                currentOrder = SamplingOrderDetector.GoldLocation.RIGHT;
             }
-
+            isFound = true;
             lastOrder = currentOrder;
 
         }else{
-            currentOrder = MineralRowLocation.UNKNOWN;
+            currentOrder = SamplingOrderDetector.GoldLocation.UNKNOWN;
+            isFound = false;
         }
 
-
-        Imgproc.putText(workingMat,"Gold Position: " + lastOrder.toString(),new Point(10,newSize.height - 30),0,1, new Scalar(255,255,0),1);
-        Imgproc.putText(workingMat,"Current Track: " + currentOrder.toString(),new Point(10,newSize.height - 10),0,0.5, new Scalar(255,255,255),1);
-
-        Imgproc.resize(workingMat,workingMat,initSize);
-
-        yellowConvert.release();
-        whiteConvert.release();
-        Imgproc.putText(workingMat,"DogeCV 2.0 Sampling Order: " + newSize.toString() + " - " + speed.toString() + " - " + detectionMode.toString() ,new Point(5,30),0,1.2,new Scalar(0,255,255),2);
+        Imgproc.putText(workingMat,"Gold Position: " + lastOrder.toString(),new Point(10,getAdjustedSize().height - 30),0,1, new Scalar(255,255,0),1);
+        Imgproc.putText(workingMat,"Current Track: " + currentOrder.toString(),new Point(10,getAdjustedSize().height - 10),0,0.5, new Scalar(255,255,255),1);
+        Imgproc.putText(workingMat,"DogeCV 2018.0 Sampling Order: " + getAdjustedSize().toString() + " - " + speed.toString() ,new Point(5,30),0,0.5,new Scalar(0,255,255),2);
 
         return workingMat;
     }
 
-    public MineralRowLocation getCurrentOrder() {
+    @Override
+    public void useDefaults() {
+        addScorer(maxAreaScorer);
+        addScorer(ratioScorer);
+    }
+
+    public boolean isFound() {
+        return isFound;
+    }
+
+    public GoldLocation getCurrentOrder() {
         return currentOrder;
     }
 
-    public MineralRowLocation getLastOrder() {
+    public GoldLocation getLastOrder() {
         return lastOrder;
     }
 }

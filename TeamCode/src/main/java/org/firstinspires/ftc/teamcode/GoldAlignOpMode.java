@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
-import com.disnodeteam.dogecv.detectors.roverrukus.SamplingOrderDetector;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -57,7 +56,6 @@ public class GoldAlignOpMode extends OpMode
 
     private ElapsedTime runtime = new ElapsedTime();
     private GoldAlignDetector detector = null;
-    private SamplingOrderDetector detector2 = null;
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
@@ -65,9 +63,6 @@ public class GoldAlignOpMode extends OpMode
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
         detector.enable();
 
-        detector2 = new SamplingOrderDetector();
-        detector2.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
-        detector2.enable();
     }
 
     @Override
