@@ -31,7 +31,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.Dogeforia;
+import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.disnodeteam.dogecv.detectors.roverrukus.SamplingOrderDetector;
+import com.disnodeteam.dogecv.filters.LeviColorFilter;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -89,7 +91,7 @@ public class VuforiaTesting extends OpMode
     WebcamName webcamName;
     List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
 
-    SamplingOrderDetector detector;
+    GoldAlignDetector detector;
 
     @Override
     public void init() {
@@ -158,9 +160,11 @@ public class VuforiaTesting extends OpMode
 
         targetsRoverRuckus.activate();
 
-        detector = new SamplingOrderDetector();
+        detector = new GoldAlignDetector();
         detector.init(hardwareMap.appContext,CameraViewDisplay.getInstance(), 0, true);
         detector.useDefaults();
+        detector.downscale = 0.8;
+        detector.yellowFilter = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW, 100);
         vuforia.setDogeCVDetector(detector);
         vuforia.enableDogeCV();
         vuforia.showDebug();

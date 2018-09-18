@@ -112,7 +112,7 @@ public class Dogeforia extends VuforiaLocalizerImpl {
 
             Mat inputMat = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC1);
             Utils.bitmapToMat(bitmap,inputMat);
-            Mat outMat = detector.process(inputMat).clone();
+            Mat outMat = detector.processFrame(inputMat, null).clone();
 
             if(showDebug){
                 VuforiaTrackablesImpl trackables = loadedTrackableSets.get(0);

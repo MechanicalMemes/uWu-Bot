@@ -49,7 +49,6 @@ public class GoldAlignDetector extends DogeCVDetector {
     public DogeCVScorer      ratioScorer        = new RatioScorer(1.0, 5);
     public DogeCVScorer      maxAreScorer       = new MaxAreaScorer(5000, 0.005);
 
-    puib
     @Override
     public Mat process(Mat input) {
         if(input.channels() < 0 || input.cols() <= 0){
