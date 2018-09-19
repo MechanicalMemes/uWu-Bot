@@ -46,14 +46,14 @@ public class GoldAlignDetector extends DogeCVDetector {
     public double alignPosOffset = 0;
     public double alignSize = 100;
     public DogeCVColorFilter yellowFilter   = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW);
-    public DogeCVScorer      ratioScorer        = new RatioScorer(1.0, 5);
-    public DogeCVScorer      maxAreScorer       = new MaxAreaScorer(5000, 0.005);
+    public RatioScorer      ratioScorer        = new RatioScorer(1.0, 5);
+    public MaxAreaScorer      maxAreaScorer       = new MaxAreaScorer(5000, 0.005);
 
     @Override
     public Mat process(Mat input) {
         if(input.channels() < 0 || input.cols() <= 0){
             Log.e("DogeCV", "Bad INPUT MAT!");
-            return input;
+
         }
         input.copyTo(workingMat);
 
@@ -132,7 +132,7 @@ public class GoldAlignDetector extends DogeCVDetector {
     @Override
     public void useDefaults() {
         addScorer(ratioScorer);
-        addScorer(maxAreScorer);
+        addScorer(maxAreaScorer);
     }
 
     public boolean getAligned(){

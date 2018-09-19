@@ -31,9 +31,8 @@ public class LeviColorFilter extends DogeCVColorFilter {
 
     public LeviColorFilter(ColorPreset filterColor, double filterThreshold){
         color = filterColor;
-        filterThreshold = filterThreshold;
+        threshold = filterThreshold;
     }
-
 
 
     @Override

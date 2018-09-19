@@ -13,6 +13,7 @@ import com.vuforia.CameraDevice;
 import com.vuforia.Frame;
 import com.vuforia.Matrix34F;
 import com.vuforia.Matrix44F;
+import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Tool;
 import com.vuforia.Trackable;
 import com.vuforia.TrackableResult;
@@ -22,6 +23,9 @@ import org.firstinspires.ftc.robotcore.external.function.Continuation;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.internal.camera.libuvc.api.UvcApiCameraCaptureRequest;
+import org.firstinspires.ftc.robotcore.internal.camera.libuvc.api.UvcApiCameraFrame;
+import org.firstinspires.ftc.robotcore.internal.camera.libuvc.api.UvcApiCaptureSession;
 import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaLocalizerImpl;
 import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaTrackableImpl;
 import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaTrackablesImpl;
@@ -37,6 +41,9 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Logger;
+
+import static com.vuforia.Vuforia.setFrameFormat;
 
 /**
  * Created by Victo on 9/12/2018.
@@ -49,8 +56,10 @@ public class Dogeforia extends VuforiaLocalizerImpl {
     boolean showDebug = false;
 
     Thread workerThread;
-
-
+    Bitmap outputImage;
+    Bitmap bitmap;
+    Mat inputMat;
+    Mat outMat;
     public Dogeforia(Parameters parameters) {
         super(parameters);
 
@@ -63,6 +72,7 @@ public class Dogeforia extends VuforiaLocalizerImpl {
         detector.enable();
         displayView = detector.getRawView();
         setMonitorViewParent(displayView.getId());
+
 
     }
 
@@ -105,14 +115,14 @@ public class Dogeforia extends VuforiaLocalizerImpl {
     }
 
     public void processFrame(Frame frame){
-        if(frame != null){
+        if(frame != null && frame.getNumImages() > 0){
 
-            Bitmap bitmap = convertFrameToBitmap(frame);
+            bitmap = convertFrameToBitmap(frame);
 
 
-            Mat inputMat = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC1);
+            inputMat = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC1);
             Utils.bitmapToMat(bitmap,inputMat);
-            Mat outMat = detector.processFrame(inputMat, null).clone();
+            outMat = detector.processFrame(inputMat, null);
 
             if(showDebug){
                 VuforiaTrackablesImpl trackables = loadedTrackableSets.get(0);
@@ -126,14 +136,23 @@ public class Dogeforia extends VuforiaLocalizerImpl {
                 }
             }
 
-            Utils.matToBitmap(outMat, bitmap);
-            Bitmap outputImage =  Bitmap.createScaledBitmap(bitmap,displayView.getWidth(), displayView.getHeight(), false);
 
-            displayView.onFrame(outputImage);
-            displayView.invalidate();
+            if(!outMat.empty() ){
+
+                bitmap.setHeight(outMat.height());
+                bitmap.setWidth(outMat.width());
+                Utils.matToBitmap(outMat, bitmap);
+                outputImage =  Bitmap.createScaledBitmap(bitmap,displayView.getWidth(), displayView.getHeight(), false);
+                displayView.onFrame(outputImage);
+                displayView.invalidate();
+            }else{
+                Log.w("DogeCV", "MAT BITMAP MISMATCH OR EMPTY ERROR");
+            }
+
 
             inputMat.release();
             outMat.release();
+
 
         }else{
             Log.d("DogeCV", "No Frame!");
@@ -142,7 +161,7 @@ public class Dogeforia extends VuforiaLocalizerImpl {
 
     public void render() {
        // Log.d("DogeCV", "Rendering Frame");
-       // super.onRenderFrame();
+       // super.onRenderFrame()
 
         if(detector != null && dogeCVEnabled){
             getFrameOnce(Continuation.create(ThreadPool.getDefault(), new Consumer<Frame>()
@@ -154,5 +173,11 @@ public class Dogeforia extends VuforiaLocalizerImpl {
             }));
         }
 
+    }
+
+    public void stop(){
+        this.stopCamera();
+        this.stopTracker();
+        detector.disable();
     }
 }

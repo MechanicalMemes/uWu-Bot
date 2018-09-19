@@ -15,9 +15,14 @@ public class HSVColorFilter extends DogeCVColorFilter{
     private Scalar perfect = new Scalar(255,255,255);
     private Scalar range = new Scalar(0,0,0);
 
-    public HSVColorFilter(Scalar color, Scalar threshold){
+    public HSVColorFilter(Scalar color, Scalar range){
+        this.perfect = color;
+        this.range = range;
+    }
+
+    public void updateSettings(Scalar color, Scalar range){
         perfect = color;
-        range = threshold;
+        this.range = range;
     }
 
     @Override

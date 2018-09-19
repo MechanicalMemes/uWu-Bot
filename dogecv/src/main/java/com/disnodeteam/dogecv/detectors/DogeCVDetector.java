@@ -63,13 +63,16 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
 
 
 
+
         adjustedSize = new Size(initSize.width * downscale, initSize.height * downscale);
         rgba.copyTo(workingMat);
 
-
+        if(workingMat.empty()){
+            return rgba;
+        }
         Imgproc.resize(workingMat, workingMat,adjustedSize);
 
-        Imgproc.resize(process(workingMat),workingMat,initSize);
+        Imgproc.resize(process(workingMat),workingMat,getInitSize());
         return workingMat;
     }
 
