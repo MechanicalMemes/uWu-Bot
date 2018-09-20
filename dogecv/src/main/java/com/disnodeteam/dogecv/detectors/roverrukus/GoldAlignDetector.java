@@ -46,8 +46,8 @@ public class GoldAlignDetector extends DogeCVDetector {
     public double alignPosOffset = 0;
     public double alignSize = 100;
     public DogeCVColorFilter yellowFilter   = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW);
-    public RatioScorer      ratioScorer        = new RatioScorer(1.0, 5);
-    public MaxAreaScorer      maxAreaScorer       = new MaxAreaScorer(5000, 0.005);
+    public RatioScorer      ratioScorer        = new RatioScorer(1.0, 3);
+    public MaxAreaScorer      maxAreaScorer       = new MaxAreaScorer(5000, 0.01);
 
     @Override
     public Mat process(Mat input) {
