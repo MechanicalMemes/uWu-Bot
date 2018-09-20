@@ -56,6 +56,7 @@ public class GoldAlignDetector extends DogeCVDetector {
 
         }
         input.copyTo(workingMat);
+        input.release();
 
         Imgproc.GaussianBlur(workingMat,workingMat,new Size(5,5),0);
         yellowFilter.process(workingMat.clone(),maskYellow);
@@ -88,6 +89,7 @@ public class GoldAlignDetector extends DogeCVDetector {
         double alignXMin = alignX - (alignSize / 2);
         double alignXMax = alignX +(alignSize / 2);
         double xPos = 0;
+
 
 
         if(bestRect != null){

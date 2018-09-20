@@ -60,6 +60,7 @@ public class Dogeforia extends VuforiaLocalizerImpl {
     Bitmap bitmap;
     Mat inputMat;
     Mat outMat;
+    BlockingQueue<CloseableFrame> frames;
     public Dogeforia(Parameters parameters) {
         super(parameters);
 
@@ -72,8 +73,7 @@ public class Dogeforia extends VuforiaLocalizerImpl {
         detector.enable();
         displayView = detector.getRawView();
         setMonitorViewParent(displayView.getId());
-
-
+        setFrameQueueCapacity(1);
     }
 
     public void start(){
@@ -115,10 +115,9 @@ public class Dogeforia extends VuforiaLocalizerImpl {
     }
 
     public void processFrame(Frame frame){
-        if(frame != null && frame.getNumImages() > 0){
+        if(frame != null ){
 
             bitmap = convertFrameToBitmap(frame);
-
 
             inputMat = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC1);
             Utils.bitmapToMat(bitmap,inputMat);
@@ -164,6 +163,18 @@ public class Dogeforia extends VuforiaLocalizerImpl {
        // super.onRenderFrame()
 
         if(detector != null && dogeCVEnabled){
+
+            if(!frameQueue.isEmpty()){
+                try {
+                    processFrame(frameQueue.take());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                Log.w("DogeCV", "Frame is empty wtf: " + getFrameQueueCapacity());
+            }
+
+            /*
             getFrameOnce(Continuation.create(ThreadPool.getDefault(), new Consumer<Frame>()
             {
                 @Override public void accept(Frame frame)
@@ -171,6 +182,7 @@ public class Dogeforia extends VuforiaLocalizerImpl {
                     processFrame(frame);
                 }
             }));
+             */
         }
 
     }

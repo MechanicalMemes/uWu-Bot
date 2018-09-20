@@ -56,9 +56,9 @@ public class GoldAlignExample extends OpMode
         detector.alignPosOffset = 0; // How far from center frame to offset this alignment zone.
         detector.downscale = 0.4; // How much to downscale the input frames
 
-        detector.maxAreaScorer.weight = 0.001;
+        detector.maxAreaScorer.weight = 0.005;
 
-        detector.ratioScorer.weight = 15;
+        detector.ratioScorer.weight = 5;
         detector.ratioScorer.perfectRatio = 1.0;
 
         detector.enable();
