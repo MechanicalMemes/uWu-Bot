@@ -142,8 +142,15 @@ public class Dogeforia extends VuforiaLocalizerImpl {
                 bitmap.setWidth(outMat.width());
                 Utils.matToBitmap(outMat, bitmap);
                 outputImage =  Bitmap.createScaledBitmap(bitmap,displayView.getWidth(), displayView.getHeight(), false);
-                displayView.onFrame(outputImage);
-                displayView.invalidate();
+
+                ((Activity)displayView.getContext()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        displayView.onFrame(outputImage);
+                        displayView.invalidate();
+                    }
+                });
+
             }else{
                 Log.w("DogeCV", "MAT BITMAP MISMATCH OR EMPTY ERROR");
             }
