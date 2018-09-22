@@ -160,8 +160,7 @@ public class VuforiaPhoneTesting extends OpMode
 
         detector = new GoldAlignDetector();
         detector.init(hardwareMap.appContext,CameraViewDisplay.getInstance(), 0, true);
-        detector.useDefaults();
-        detector.downscale = 0.8;
+
         detector.yellowFilter = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW, 100);
         vuforia.setDogeCVDetector(detector);
         vuforia.enableDogeCV();
