@@ -84,7 +84,7 @@ public class Dogeforia extends VuforiaLocalizerImpl {
                     render();
 
 
-                }while (true);
+                }while (!workerThread.isInterrupted());
             }
         });
         workerThread.setName("Dogeforia Thread");
@@ -121,6 +121,7 @@ public class Dogeforia extends VuforiaLocalizerImpl {
 
             inputMat = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC1);
             Utils.bitmapToMat(bitmap,inputMat);
+
             outMat = detector.processFrame(inputMat, null);
 
             if(showDebug){
@@ -141,7 +142,12 @@ public class Dogeforia extends VuforiaLocalizerImpl {
                 bitmap.setHeight(outMat.height());
                 bitmap.setWidth(outMat.width());
                 Utils.matToBitmap(outMat, bitmap);
-                outputImage =  Bitmap.createScaledBitmap(bitmap,displayView.getWidth(), displayView.getHeight(), false);
+
+
+
+                //height = <user-chosen width> * original height / original width
+                double adjustedHieght = displayView.getWidth() * outMat.height()/ outMat.width();
+                outputImage =  Bitmap.createScaledBitmap(bitmap,displayView.getWidth(), (int)adjustedHieght, false);
 
                 ((Activity)displayView.getContext()).runOnUiThread(new Runnable() {
                     @Override
@@ -195,8 +201,16 @@ public class Dogeforia extends VuforiaLocalizerImpl {
     }
 
     public void stop(){
-        this.stopCamera();
-        this.stopTracker();
-        detector.disable();
+
+        ((Activity)displayView.getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                stopCamera();
+                stopTracker();
+                detector.disable();
+                workerThread.interrupt();
+            }
+        });
+
     }
 }
