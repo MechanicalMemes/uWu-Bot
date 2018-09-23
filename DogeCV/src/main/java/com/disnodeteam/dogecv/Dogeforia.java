@@ -80,11 +80,9 @@ public class Dogeforia extends VuforiaLocalizerImpl {
         workerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                do {
+                while(!workerThread.isInterrupted()){
                     render();
-
-
-                }while (!workerThread.isInterrupted());
+                }
             }
         });
         workerThread.setName("Dogeforia Thread");
@@ -205,10 +203,10 @@ public class Dogeforia extends VuforiaLocalizerImpl {
         ((Activity)displayView.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                workerThread.interrupt();
                 stopCamera();
                 stopTracker();
                 detector.disable();
-                workerThread.interrupt();
             }
         });
 
