@@ -11,11 +11,10 @@ import org.opencv.imgproc.Imgproc;
 
 public class MaxAreaScorer extends DogeCVScorer{
     public double weight       = 1.0;
-    public double max          = 500;
 
-    public MaxAreaScorer( double max, double weight){
+    public MaxAreaScorer( double weight){
         this.weight = weight;
-        this.max = max;
+
     }
 
     @Override
@@ -23,8 +22,6 @@ public class MaxAreaScorer extends DogeCVScorer{
 
 
         double area = Imgproc.contourArea(contours);
-
-        double normalizedArea = (max - area) / max;
 
         return -area * weight;
     }

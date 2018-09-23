@@ -8,6 +8,7 @@ import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
 import com.disnodeteam.dogecv.filters.HSVColorFilter;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
+import com.disnodeteam.dogecv.scoring.PerfectAreaScorer;
 import com.disnodeteam.dogecv.scoring.RatioScorer;
 
 import org.opencv.core.Core;
@@ -40,7 +41,8 @@ public class SamplingOrderDetector extends DogeCVDetector {
     public DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
 
     public RatioScorer ratioScorer = new RatioScorer(1.0,10);
-    public MaxAreaScorer maxAreaScorer = new MaxAreaScorer(50000,0.005);
+    public MaxAreaScorer maxAreaScorer = new MaxAreaScorer(0.005);
+    public PerfectAreaScorer perfectAreaScorer = new PerfectAreaScorer(5000,0.05);
 
 
     public DogeCVColorFilter yellowFilter = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW,70);
@@ -58,7 +60,7 @@ public class SamplingOrderDetector extends DogeCVDetector {
     private Mat hiarchy     = new Mat();
     private Mat structure   = new Mat();
 
-    public Size stretchKernal = new Size(10,10);
+    private Size stretchKernal = new Size(10,10);
     private Size newSize = new Size();
 
     @Override
@@ -242,7 +244,13 @@ public class SamplingOrderDetector extends DogeCVDetector {
 
     @Override
     public void useDefaults() {
-        addScorer(maxAreaScorer);
+        if(areaScoringMethod == DogeCV.AreaScoringMethod.MAX_AREA){
+            addScorer(maxAreaScorer);
+        }
+
+        if (areaScoringMethod == DogeCV.AreaScoringMethod.PERFECT_AREA){
+            addScorer(perfectAreaScorer);
+        }
         addScorer(ratioScorer);
     }
 

@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.dogecv;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
+import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.Dogeforia;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.disnodeteam.dogecv.detectors.roverrukus.SamplingOrderDetector;
@@ -163,8 +164,10 @@ public class VuforiaWebcamTesting extends OpMode
         detector = new GoldAlignDetector();
         detector.init(hardwareMap.appContext,CameraViewDisplay.getInstance(), 0, true);
         detector.useDefaults();
+        detector.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Can also be PERFECT_AREA
+        //detector.perfectAreaScorer.perfectArea = 10000; // if using PERFECT_AREA scoring
         detector.downscale = 0.8;
-        detector.yellowFilter = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW, 100);
+
         vuforia.setDogeCVDetector(detector);
         vuforia.enableDogeCV();
         vuforia.showDebug();

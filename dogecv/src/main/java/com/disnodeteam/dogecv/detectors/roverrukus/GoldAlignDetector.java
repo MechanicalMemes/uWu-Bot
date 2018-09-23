@@ -2,11 +2,13 @@ package com.disnodeteam.dogecv.detectors.roverrukus;
 
 import android.util.Log;
 
+import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
 import com.disnodeteam.dogecv.scoring.DogeCVScorer;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
+import com.disnodeteam.dogecv.scoring.PerfectAreaScorer;
 import com.disnodeteam.dogecv.scoring.RatioScorer;
 
 import org.opencv.core.Mat;
@@ -39,15 +41,20 @@ public class GoldAlignDetector extends DogeCVDetector {
     private boolean found = false;
     private boolean aligned = false;
     private double goldXPos = 0;
+
+
     public boolean debugAlignment = true;
     public boolean debugContours  = true;
     public boolean stretch        = true;
     public double minArea = 1000;
     public double alignPosOffset = 0;
     public double alignSize = 100;
+
+    public DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
     public DogeCVColorFilter yellowFilter   = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW);
     public RatioScorer      ratioScorer        = new RatioScorer(1.0, 3);
-    public MaxAreaScorer      maxAreaScorer       = new MaxAreaScorer(5000, 0.01);
+    public MaxAreaScorer    maxAreaScorer      = new MaxAreaScorer( 0.01);
+    public PerfectAreaScorer perfectAreaScorer = new PerfectAreaScorer(5000,0.05);
 
     @Override
     public Mat process(Mat input) {
@@ -134,7 +141,14 @@ public class GoldAlignDetector extends DogeCVDetector {
     @Override
     public void useDefaults() {
         addScorer(ratioScorer);
-        addScorer(maxAreaScorer);
+        if(areaScoringMethod == DogeCV.AreaScoringMethod.MAX_AREA){
+            addScorer(maxAreaScorer);
+        }
+
+        if (areaScoringMethod == DogeCV.AreaScoringMethod.PERFECT_AREA){
+            addScorer(perfectAreaScorer);
+        }
+
     }
 
     public boolean getAligned(){
