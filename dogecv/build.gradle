@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 27
     buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 19
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
 
@@ -19,13 +19,30 @@ android {
         }
     }
 }
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://dl.bintray.com/openftc/maven'
+        }
+
+        dependencies{
+            classpath 'org.openftc:opencv-repackaged:3.4.2-test'
+        }
+    }
+}
+
 repositories {
     flatDir {
         dirs '../libs'
     }
+    mavenCentral()
+    maven {
+        url 'https://dl.bintray.com/openftc/maven'
+    }
 }
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(path: ':openCVLibrary3')
-    implementation project(':FtcRobotController')
+    implementation (name: 'RobotCore-release', ext: 'aar')
 }
