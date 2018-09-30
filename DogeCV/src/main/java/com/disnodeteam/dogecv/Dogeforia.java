@@ -199,12 +199,12 @@ public class Dogeforia extends VuforiaLocalizerImpl {
     }
 
     public void stop(){
-
+        close();
         ((Activity)displayView.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 workerThread.interrupt();
-                close();
+
                 detector.disable();
             }
         });
