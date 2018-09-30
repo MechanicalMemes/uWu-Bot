@@ -5,14 +5,13 @@ import android.util.Log;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
-import com.disnodeteam.dogecv.filters.LeviColorFilter;
+import com.disnodeteam.dogecv.filters.HSVColorFilter;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
 import com.disnodeteam.dogecv.scoring.PerfectAreaScorer;
 import com.disnodeteam.dogecv.scoring.RatioScorer;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -26,26 +25,27 @@ import java.util.List;
  * Created by Victo on 9/10/2018.
  */
 
-public class GoldDetector extends DogeCVDetector {
+public class SilverDetector extends DogeCVDetector {
 
     public DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
 
     public RatioScorer ratioScorer = new RatioScorer(1.0,1);
     public MaxAreaScorer maxAreaScorer = new MaxAreaScorer(0.005);
     public PerfectAreaScorer perfectAreaScorer = new PerfectAreaScorer(5000,0.05);
-    public DogeCVColorFilter yellowFilter = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW,40);
+    public DogeCVColorFilter whiteFilter  = new HSVColorFilter(new Scalar(40,25,200), new Scalar(40,40,50));
 
-    private Mat yellowMask = new Mat();
+    private Mat whiteMask = new Mat();
     private Mat workingMat = new Mat();
     private Mat hiarchy    = new Mat();
     private int results;
     private Rect foundRect;
     private boolean isFound = false;
 
-    public GoldDetector() {
+    public SilverDetector() {
         super();
-        this.detectorName = "Gold Detector";
+        this.detectorName = "Silver Detector";
     }
+
     @Override
     public Mat process(Mat input) {
         if(input.channels() < 0 || input.cols() <= 0){
@@ -53,11 +53,11 @@ public class GoldDetector extends DogeCVDetector {
         }
         input.copyTo(workingMat);
         Imgproc.GaussianBlur(workingMat,workingMat,new Size(5,5),0);
-        yellowFilter.process(workingMat,yellowMask);
+        whiteFilter.process(workingMat,whiteMask);
 
         List<MatOfPoint> contoursYellow = new ArrayList<>();
 
-        Imgproc.findContours(yellowMask, contoursYellow, hiarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(whiteMask, contoursYellow, hiarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         Imgproc.drawContours(workingMat,contoursYellow,-1,new Scalar(230,70,70),2);
         results = 0;
 

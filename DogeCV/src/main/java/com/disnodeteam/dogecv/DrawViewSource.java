@@ -57,7 +57,7 @@ public class DrawViewSource extends View {
 
         resources = context.getResources();
         bitmap = BitmapFactory
-                .decodeResource(resources, R.drawable.ic_launcher);
+                .decodeResource(resources, R.drawable.feedback_shape_orange);
 
 
         setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));

@@ -28,7 +28,7 @@ public class HSVRangeFilter extends DogeCVColorFilter{
     public void process(Mat input, Mat mask) {
         Imgproc.cvtColor(input,input,Imgproc.COLOR_RGB2HSV_FULL);
         Imgproc.GaussianBlur(input,input,new Size(5,5),0);
-        
+
         Core.inRange(input,lower,upper,mask);
         input.release();
     }

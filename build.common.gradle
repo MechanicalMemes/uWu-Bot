@@ -36,6 +36,7 @@ android {
         applicationId 'com.qualcomm.ftcrobotcontroller'
         minSdkVersion 19
         targetSdkVersion 19
+        multiDexEnabled true
 
         /**
          * We keep the versionCode and versionName of robot controller applications in sync with
