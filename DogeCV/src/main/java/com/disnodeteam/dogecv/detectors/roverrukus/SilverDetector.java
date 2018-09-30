@@ -6,6 +6,7 @@ import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
 import com.disnodeteam.dogecv.filters.HSVColorFilter;
+import com.disnodeteam.dogecv.filters.HSVRangeFilter;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
 import com.disnodeteam.dogecv.scoring.PerfectAreaScorer;
 import com.disnodeteam.dogecv.scoring.RatioScorer;
@@ -32,7 +33,8 @@ public class SilverDetector extends DogeCVDetector {
     public RatioScorer ratioScorer = new RatioScorer(1.0,1);
     public MaxAreaScorer maxAreaScorer = new MaxAreaScorer(0.005);
     public PerfectAreaScorer perfectAreaScorer = new PerfectAreaScorer(5000,0.05);
-    public DogeCVColorFilter whiteFilter  = new HSVColorFilter(new Scalar(40,25,200), new Scalar(40,40,50));
+    public DogeCVColorFilter whiteFilter  = new HSVRangeFilter(new Scalar(0,0,200), new Scalar(50,40,255));
+
 
     private Mat whiteMask = new Mat();
     private Mat workingMat = new Mat();
