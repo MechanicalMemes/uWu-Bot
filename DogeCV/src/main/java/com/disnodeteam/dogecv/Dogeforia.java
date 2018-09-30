@@ -175,9 +175,9 @@ public class Dogeforia extends VuforiaLocalizerImpl {
 
         if(detector != null && dogeCVEnabled){
 
-            if(!frameQueue.isEmpty()){
+            if(!getFrameQueue().isEmpty()){
                 try {
-                    processFrame(frameQueue.take());
+                    processFrame(getFrameQueue().take());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -204,8 +204,7 @@ public class Dogeforia extends VuforiaLocalizerImpl {
             @Override
             public void run() {
                 workerThread.interrupt();
-                stopCamera();
-                stopTracker();
+                close();
                 detector.disable();
             }
         });
