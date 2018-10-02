@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
+import com.disnodeteam.dogecv.filters.AsyncFilterRunner;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
 import com.disnodeteam.dogecv.filters.HSVColorFilter;
 import com.disnodeteam.dogecv.filters.HSVRangeFilter;
@@ -42,6 +43,11 @@ public class SilverDetector extends DogeCVDetector {
     private int results;
     private Rect foundRect;
     private boolean isFound = false;
+    private boolean showMask = false;
+
+    public void setShowMask(boolean showMask) {
+        this.showMask = showMask;
+    }
 
     public SilverDetector() {
         super();
@@ -92,7 +98,9 @@ public class SilverDetector extends DogeCVDetector {
         }
 
 
-
+        if(showMask){
+            return whiteMask;
+        }
         return workingMat;
     }
 
@@ -115,4 +123,6 @@ public class SilverDetector extends DogeCVDetector {
     public Rect getFoundRect() {
         return foundRect;
     }
+
+
 }

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
+import com.disnodeteam.dogecv.filters.AsyncFilterRunner;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
 import com.disnodeteam.dogecv.filters.HSVColorFilter;
 import com.disnodeteam.dogecv.filters.HSVRangeFilter;
@@ -45,6 +46,7 @@ public class SamplingOrderDetector extends DogeCVDetector {
     public MaxAreaScorer maxAreaScorer = new MaxAreaScorer(0.01);
     public PerfectAreaScorer perfectAreaScorer = new PerfectAreaScorer(5000,0.05);
 
+    public AsyncFilterRunner filterRunner = new AsyncFilterRunner();
 
     public DogeCVColorFilter yellowFilter = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW,100);
     public DogeCVColorFilter whiteFilter  = new HSVRangeFilter(new Scalar(0,0,200), new Scalar(50,40,255));
@@ -77,9 +79,15 @@ public class SamplingOrderDetector extends DogeCVDetector {
         input.copyTo(workingMat);
         input.release();
 
+        if(false){
+            filterRunner.addFilter(yellowFilter, workingMat.clone(), yellowMask);
+            filterRunner.addFilter(whiteFilter, workingMat.clone(), whiteMask);
 
-        yellowFilter.process(workingMat.clone(),yellowMask);
-        whiteFilter.process(workingMat.clone(), whiteMask);
+            filterRunner.runAll();
+        }else{
+            yellowFilter.process(workingMat.clone(), yellowMask);
+            whiteFilter.process(workingMat.clone(), whiteMask);
+        }
 
 
         List<MatOfPoint> contoursYellow = new ArrayList<>();

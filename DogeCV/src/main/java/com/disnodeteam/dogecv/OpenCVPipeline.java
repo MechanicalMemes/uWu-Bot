@@ -84,6 +84,7 @@ public abstract class OpenCVPipeline implements CameraBridgeViewBase.CvCameraVie
         final Activity activity = (Activity) context;
         final Context finalContext = context;
         final CameraBridgeViewBase.CvCameraViewListener2 self = this;
+
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -94,6 +95,8 @@ public abstract class OpenCVPipeline implements CameraBridgeViewBase.CvCameraVie
                     cameraView = new CustomCameraView(finalContext, cameraIndex);
                     cameraView.setCameraIndex(cameraIndex);
                     cameraView.setCvCameraViewListener(self);
+                    cameraView.enableFpsMeter();
+
                 }
                 inited = true;
             }

@@ -130,12 +130,7 @@ public class GoldAlignDetector extends DogeCVDetector {
         }
 
 
-
-
-
         Imgproc.putText(workingMat,"Result: " + aligned,new Point(10,getAdjustedSize().height - 30),0,1, new Scalar(255,255,0),1);
-
-
 
 
         return workingMat;
