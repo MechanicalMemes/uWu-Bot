@@ -28,4 +28,5 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(path: ':openCVLibrary3')
     implementation (name: 'RobotCore-release', ext: 'aar')
+    compile "org.tensorflow:tensorflow-lite:+"
 }
