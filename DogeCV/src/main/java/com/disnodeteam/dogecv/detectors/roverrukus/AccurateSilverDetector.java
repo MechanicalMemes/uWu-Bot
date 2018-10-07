@@ -71,7 +71,8 @@ public class AccurateSilverDetector extends DogeCVDetector {
             Log.e("DogeCV", "Bad INPUT MAT!");
         }
         input.copyTo(workingMat);
-
+        workingMat2 = new Mat();
+        Log.i("DogeCV", "Mat Channels: " + Double.toString(workingMat.channels()));
         Imgproc.bilateralFilter(workingMat, workingMat2, 5, 175, 175);
         workingMat2.copyTo(workingMat);
         Imgproc.cvtColor(workingMat, workingMat, Imgproc.COLOR_BGR2Lab);

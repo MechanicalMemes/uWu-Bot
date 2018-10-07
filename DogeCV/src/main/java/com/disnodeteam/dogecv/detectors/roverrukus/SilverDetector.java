@@ -4,9 +4,7 @@ import android.util.Log;
 
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
-import com.disnodeteam.dogecv.filters.AsyncFilterRunner;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
-import com.disnodeteam.dogecv.filters.HSVColorFilter;
 import com.disnodeteam.dogecv.filters.HSVRangeFilter;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
 import com.disnodeteam.dogecv.scoring.PerfectAreaScorer;
@@ -14,7 +12,6 @@ import com.disnodeteam.dogecv.scoring.RatioScorer;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -39,7 +36,7 @@ public class SilverDetector extends DogeCVDetector {
 
     private Mat whiteMask = new Mat();
     private Mat workingMat = new Mat();
-    private Mat hiarchy    = new Mat();
+    private Mat hierachy = new Mat();
     private int results;
     private Rect foundRect;
     private boolean isFound = false;
@@ -61,11 +58,15 @@ public class SilverDetector extends DogeCVDetector {
         }
         input.copyTo(workingMat);
         Imgproc.GaussianBlur(workingMat,workingMat,new Size(5,5),0);
-        whiteFilter.process(workingMat,whiteMask);
+        Mat filtered = new Mat();
+        workingMat.copyTo(filtered);
+        whiteFilter.process(filtered,whiteMask);
+        filtered.release();
+        //if(input.channels() > 0) return workingMat;
 
         List<MatOfPoint> contoursYellow = new ArrayList<>();
 
-        Imgproc.findContours(whiteMask, contoursYellow, hiarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(whiteMask, contoursYellow, hierachy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         Imgproc.drawContours(workingMat,contoursYellow,-1,new Scalar(230,70,70),2);
         results = 0;
 

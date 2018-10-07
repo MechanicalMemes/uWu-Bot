@@ -6,14 +6,12 @@ import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
-import com.disnodeteam.dogecv.scoring.DogeCVScorer;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
 import com.disnodeteam.dogecv.scoring.PerfectAreaScorer;
 import com.disnodeteam.dogecv.scoring.RatioScorer;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -32,7 +30,7 @@ public class GoldAlignDetector extends DogeCVDetector {
     private Mat workingMat = new Mat();
     private Mat blurredMat  = new Mat();
     private Mat maskYellow = new Mat();
-    private Mat hiarchy  = new Mat();
+    private Mat hierarchy = new Mat();
     private Mat structure = new Mat();
     private Size stretchKernal = new Size(10,10);
     private Size newSize = new Size();
@@ -75,7 +73,7 @@ public class GoldAlignDetector extends DogeCVDetector {
 
         List<MatOfPoint> contoursYellow = new ArrayList<>();
 
-        Imgproc.findContours(maskYellow, contoursYellow, hiarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(maskYellow, contoursYellow, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         Imgproc.drawContours(workingMat,contoursYellow,-1,new Scalar(230,70,70),2);
 
 
