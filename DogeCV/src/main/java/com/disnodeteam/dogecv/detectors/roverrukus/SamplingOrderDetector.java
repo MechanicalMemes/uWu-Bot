@@ -6,7 +6,6 @@ import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
 import com.disnodeteam.dogecv.filters.AsyncFilterRunner;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
-import com.disnodeteam.dogecv.filters.HSVColorFilter;
 import com.disnodeteam.dogecv.filters.HSVRangeFilter;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
@@ -123,7 +122,7 @@ public class SamplingOrderDetector extends DogeCVDetector {
 
             double diffrenceScore = calculateScore(points);
 
-            if(diffrenceScore < chosenYellowScore && diffrenceScore < maxDiffrence ){
+            if(diffrenceScore < chosenYellowScore && diffrenceScore < maxDifference){
                 chosenYellowScore = diffrenceScore;
                 chosenYellowRect = rect;
             }
@@ -173,7 +172,7 @@ public class SamplingOrderDetector extends DogeCVDetector {
             }
 
             boolean good = true;
-            if(diffrenceScore < maxDiffrence && area > 1000){
+            if(diffrenceScore < maxDifference && area > 1000){
                 for(Rect checkRect : choosenWhiteRect){
                     boolean inX = ( rect.x > (checkRect.x - (checkRect.width / 2))) && rect.x < (checkRect.x + (checkRect.width / 2));
                     boolean inY = ( rect.y > (checkRect.y - (checkRect.height / 2))) && rect.y < (checkRect.y + (checkRect.height / 2));

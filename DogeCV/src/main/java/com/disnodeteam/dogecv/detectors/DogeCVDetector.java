@@ -32,7 +32,7 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
     private Size initSize;
     private Size adjustedSize;
     private Mat workingMat = new Mat();
-    public double maxDiffrence = 10;
+    public double maxDifference = 10;
 
     public DogeCV.DetectionSpeed speed = DogeCV.DetectionSpeed.BALANCED;
     public double downscale = 0.5;
@@ -66,7 +66,7 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
 
     @Override
     public Mat processFrame(Mat rgba, Mat gray) {
-        initSize= rgba.size();
+        initSize = rgba.size();
 
         if(useFixedDownscale){
             adjustedSize = downscaleResolution;
@@ -94,4 +94,6 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
     public Size getAdjustedSize() {
         return adjustedSize;
     }
+
+    public void setAdjustedSize(Size size) { this.adjustedSize = size; }
 }

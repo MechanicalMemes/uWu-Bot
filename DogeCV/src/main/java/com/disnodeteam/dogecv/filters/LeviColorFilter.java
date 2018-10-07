@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
@@ -19,7 +20,8 @@ public class LeviColorFilter extends DogeCVColorFilter {
     public enum ColorPreset{
         RED,
         BLUE,
-        YELLOW
+        YELLOW,
+        WHITE
     }
     private ColorPreset color = ColorPreset.RED;
     private double threshold = -1; // if -1 the color mode will use its own defaults
@@ -59,6 +61,16 @@ public class LeviColorFilter extends DogeCVColorFilter {
                 Imgproc.GaussianBlur(input,input,new Size(3,3),0);
                 Core.split(input, channels);
                 Imgproc.threshold(channels.get(1), mask, threshold, 255, Imgproc.THRESH_BINARY);
+                break;
+            case WHITE:
+                if(threshold == -1) {
+                    threshold = 150;
+                }
+
+                Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2Lab);
+                Imgproc.GaussianBlur(input,input,new Size(3,3),0);
+                Core.split(input, channels);
+                Core.inRange(channels.get(0), new Scalar(threshold, 150, 40), new Scalar(255, 150, 150), mask);
                 break;
             case YELLOW:
                 if(threshold == -1){

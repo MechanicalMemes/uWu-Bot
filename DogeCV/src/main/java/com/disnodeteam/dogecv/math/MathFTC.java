@@ -1,5 +1,8 @@
 package com.disnodeteam.dogecv.math;
 
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +19,38 @@ public class MathFTC {
         if (value > max) return max;
         else if (value < min) return min;
         else return value;
+    }
+
+    /**
+     * Returns the arithmetic mean (average) of a list
+     * @param list A list of doubles
+     * @return The mean
+     */
+    public static double mean(double[] list) {
+        if(list.length == 0) {
+            return 0;
+        }
+        double sum = 0;
+        for (int i = 0; i < list.length; i++) {
+            sum += list[i];
+        }
+        return sum / list.length;
+    }
+
+    /**
+     * Returns the arithmetic mean (average) of a list
+     * @param list A list of doubles
+     * @return The mean
+     */
+    public static double mean(Double[] list) {
+        if(list.length == 0) {
+            return 0;
+        }
+        double sum = 0;
+        for (int i = 0; i < list.length; i++) {
+            sum += list[i];
+        }
+        return sum / list.length;
     }
 
     /**
@@ -61,5 +96,20 @@ public class MathFTC {
         angle = angle % 180;
         if (angle > 0) return angle;
         else return angle+180;
+    }
+
+    public static MatOfPoint MatFromCircle(Circle circle) {
+        if (circle.radius < 4) return null;
+        Point[] points = new Point[8];
+        points[0] = new Point((int) (circle.x), (int) (circle.y-circle.radius));
+        points[1] = new Point((int) (circle.x+0.707*circle.radius), (int) (circle.y-0.707*circle.radius));
+        points[2] = new Point((int) (circle.x+circle.radius), (int) (circle.y));
+        points[3] = new Point((int) (circle.x+0.707*circle.radius), (int) (circle.y+0.707*circle.radius));
+        points[4] = new Point((int) (circle.x), (int) (circle.y+circle.radius));
+        points[5] = new Point((int) (circle.x-0.707*circle.radius), (int) (circle.y+0.707*circle.radius));
+        points[6] = new Point((int) (circle.x-circle.radius), (int) (circle.y));
+        points[6] = new Point((int) (circle.x-0.707*circle.radius), (int) (circle.y-0.707*circle.radius));
+        MatOfPoint contour = new MatOfPoint(points);
+        return contour;
     }
 }
