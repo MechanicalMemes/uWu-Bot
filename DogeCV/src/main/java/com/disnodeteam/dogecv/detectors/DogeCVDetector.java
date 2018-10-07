@@ -80,7 +80,7 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
             return rgba;
         }
         Imgproc.resize(workingMat, workingMat,adjustedSize);
-        //process(workingMat).copyTo(workingMat);
+
         Imgproc.resize(process(workingMat),workingMat,getInitSize());
         Imgproc.putText(workingMat,"DogeCV 2018.1 " + detectorName + ": " + getAdjustedSize().toString() + " - " + speed.toString() ,new Point(5,30),0,0.5,new Scalar(0,255,255),2);
 

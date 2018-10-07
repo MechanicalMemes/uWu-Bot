@@ -30,29 +30,29 @@
 package org.firstinspires.ftc.teamcode.dogecv;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
-import com.disnodeteam.dogecv.DogeCV;
-import com.disnodeteam.dogecv.detectors.roverrukus.AccurateSilverDetector;
-import com.disnodeteam.dogecv.detectors.roverrukus.SilverDetector;
+import com.disnodeteam.dogecv.detectors.roverrukus.HoughSilverDetector;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.opencv.core.Size;
 
 
-@TeleOp(name="Accurate Silver Example", group="DogeCV")
+@TeleOp(name="Hough Silver Example", group="DogeCV")
 
-public class AccurateSilverExample extends OpMode
+public class HoughSilverExample extends OpMode
 {
-    private AccurateSilverDetector detector;
+    private HoughSilverDetector detector;
 
 
     @Override
     public void init() {
         telemetry.addData("Status", "DogeCV 2018.0 - Gold SilverDetector Example");
 
-        detector = new AccurateSilverDetector();
-        detector.setAdjustedSize(new Size(480, 270));
-        detector.useFixedDownscale = true;
+        detector = new HoughSilverDetector();
+        detector.downscale = 1; //Increase detector sensitivity with smaller size. Make sure to preserve aspect ratio.
+        detector.useFixedDownscale = false;
+        detector.sensitivity = 1.6; //Play with this based on your camera
+        detector.minDistance = 60; //Minimum distance between silver mineral centers in pixels
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
         detector.useDefaults();
         // Optional Tuning
@@ -73,7 +73,8 @@ public class AccurateSilverExample extends OpMode
      */
     @Override
     public void start() {
-
+        telemetry.addLine(detector.getInitSize().toString());
+        telemetry.update();
     }
 
 
