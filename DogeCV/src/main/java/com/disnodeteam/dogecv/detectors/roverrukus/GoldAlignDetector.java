@@ -27,37 +27,39 @@ import java.util.List;
 
 public class GoldAlignDetector extends DogeCVDetector {
 
+    private Mat displayMat = new Mat();
     private Mat workingMat = new Mat();
-    private Mat blurredMat  = new Mat();
     private Mat maskYellow = new Mat();
-    private Mat hierarchy = new Mat();
-    private Mat structure = new Mat();
-    private Size stretchKernal = new Size(10,10);
-    private Size newSize = new Size();
+    private Mat hierarchy  = new Mat();
 
 
     private boolean found = false;
     private boolean aligned = false;
     private double goldXPos = 0;
 
-
     public boolean debugAlignment = true;
-    public boolean debugContours  = true;
-    public boolean stretch        = true;
-    public double minArea = 1000;
-    public double alignPosOffset = 0;
-    public double alignSize = 100;
+    public double alignPosOffset  = 0;
+    public double alignSize       = 100;
 
-    public DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA;
-    public DogeCVColorFilter yellowFilter   = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW);
-    public RatioScorer      ratioScorer        = new RatioScorer(1.0, 3);
-    public MaxAreaScorer    maxAreaScorer      = new MaxAreaScorer( 0.01);
-    public PerfectAreaScorer perfectAreaScorer = new PerfectAreaScorer(5000,0.05);
+    public DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Setting to decide to use MaxAreaScorer or PerfectAreaScorer
 
+
+    //Create the default filters and scorers
+    public DogeCVColorFilter yellowFilter      = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW); //Default Yellow filter
+
+    public RatioScorer       ratioScorer       = new RatioScorer(1.0, 3); // Used to find perfect squares
+    public MaxAreaScorer     maxAreaScorer     = new MaxAreaScorer( 0.01); // Used to find largest objects
+    public PerfectAreaScorer perfectAreaScorer = new PerfectAreaScorer(5000,0.05); // Used to find objects near a tuned area value
+
+    /**
+     *
+     */
     public GoldAlignDetector() {
         super();
-        detectorName = "Gold Align Detector";
+        detectorName = "Gold Align Detector"; // Set the detector name
     }
+
+
 
     @Override
     public Mat process(Mat input) {
@@ -98,9 +100,7 @@ public class GoldAlignDetector extends DogeCVDetector {
         double alignX = (getAdjustedSize().width / 2) + alignPosOffset;
         double alignXMin = alignX - (alignSize / 2);
         double alignXMax = alignX +(alignSize / 2);
-        double xPos = 0;
-
-
+        double xPos;
 
         if(bestRect != null){
             Imgproc.rectangle(workingMat, bestRect.tl(), bestRect.br(), new Scalar(255,0,0),4);
@@ -148,15 +148,36 @@ public class GoldAlignDetector extends DogeCVDetector {
 
     }
 
+    /**
+     * Set the alignment settings for GoldAlign
+     * @param offset - How far from center frame (in pixels)
+     * @param width - How wide the margin is (in pixels, on each side of offset)
+     */
+    public void setAlignSettings(int offset, int width){
+        alignPosOffset = offset;
+        alignSize = width;
+    }
+
+    /**
+     * Returns if the gold element is aligned
+     * @return if the gold element is alined
+     */
     public boolean getAligned(){
         return aligned;
     }
 
+    /**
+     * Returns gold element last x-position
+     * @return last x-position in screen pixels of gold element
+     */
     public double getXPosition(){
         return goldXPos;
     }
 
-
+    /**
+     * Returns if a gold mineral is being tracked/detected
+     * @return if a gold mineral is being tracked/detected
+     */
     public boolean isFound() {
         return found;
     }
