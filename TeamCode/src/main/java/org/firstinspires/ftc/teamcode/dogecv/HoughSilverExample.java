@@ -73,8 +73,7 @@ public class HoughSilverExample extends OpMode
      */
     @Override
     public void start() {
-        telemetry.addLine(detector.getInitSize().toString());
-        telemetry.update();
+
     }
 
 

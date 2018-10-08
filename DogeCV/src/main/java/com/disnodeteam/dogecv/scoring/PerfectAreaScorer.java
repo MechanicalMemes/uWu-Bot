@@ -1,5 +1,6 @@
 package com.disnodeteam.dogecv.scoring;
 
+import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.imgproc.Imgproc;
 
@@ -17,8 +18,10 @@ public class PerfectAreaScorer extends DogeCVScorer {
 
     }
     @Override
-    public double calculateDifference(MatOfPoint contours) {
-        double area = Imgproc.contourArea(contours);
+    public double calculateScore(Mat input) {
+        if(!(input instanceof MatOfPoint)) return Double.MAX_VALUE;
+        MatOfPoint contour = (MatOfPoint) input;
+        double area = Imgproc.contourArea(contour);
         double areaDiffrence = Math.abs(perfectArea - area);
         return areaDiffrence * weight;
     }

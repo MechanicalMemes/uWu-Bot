@@ -6,6 +6,7 @@ import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
 import com.disnodeteam.dogecv.math.Circle;
 import com.disnodeteam.dogecv.scoring.ColorDevScorer;
+import com.disnodeteam.dogecv.scoring.DogeCVScorer;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -26,14 +27,14 @@ public class HoughSilverDetector extends DogeCVDetector {
 
     public final DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.COLOR_DEVIATION;
 
+    public DogeCVScorer stdDevScorer = new ColorDevScorer();
+
     public double sensitivity = 1.4; //Sensitivity of circle detector; between about 1.2 and 2.1;
     public double minDistance = 60; //Adjust with frame size! This is the minimum distance between circles
 
     private Mat whiteMask = new Mat();
     private Mat workingMat = new Mat();
-    private Mat workingMat2 = new Mat();
-    private Mat hiarchy    = new Mat();
-    private Mat circleMask = new Mat();
+    private Mat displayMat = new Mat();
     private int results;
     private Circle foundCircle;
     private boolean isFound = false;
@@ -62,9 +63,9 @@ public class HoughSilverDetector extends DogeCVDetector {
         }
         input.copyTo(workingMat);
         Imgproc.cvtColor(workingMat, workingMat, Imgproc.COLOR_RGBA2RGB);
-        workingMat2 = new Mat();
-        Imgproc.bilateralFilter(workingMat, workingMat2, 5, 175, 175);
-        workingMat2.copyTo(workingMat);
+        displayMat = new Mat();
+        Imgproc.bilateralFilter(workingMat, displayMat, 5, 175, 175);
+        displayMat.copyTo(workingMat);
         Imgproc.cvtColor(workingMat, workingMat, Imgproc.COLOR_RGB2Lab);
 
 
@@ -88,13 +89,13 @@ public class HoughSilverDetector extends DogeCVDetector {
             Mat masked = new Mat((int) getAdjustedSize().height, (int) getAdjustedSize().width, CvType.CV_8UC3);
             workingMat.copyTo(masked, mask);
 
-            double score = ColorDevScorer.calculateDifferences(masked);
+            double score = calculateScore(masked);
             mask.release();
             masked.release();
 
             results++;
 
-            Imgproc.circle(workingMat2, new Point(circle.x, circle.y), (int) circle.radius, new Scalar(0,0,255),2);
+            Imgproc.circle(displayMat, new Point(circle.x, circle.y), (int) circle.radius, new Scalar(0,0,255),2);
 
             if(score < bestDifference){
                 bestDifference = score;
@@ -103,8 +104,8 @@ public class HoughSilverDetector extends DogeCVDetector {
         }
 
         if(bestCircle != null){
-            Imgproc.circle(workingMat2, new Point(bestCircle.x, bestCircle.y), (int) bestCircle.radius, new Scalar(255,0,0),4);
-            Imgproc.putText(workingMat2, "Chosen", new Point(bestCircle.x, bestCircle.y),0,.8,new Scalar(255,255,255));
+            Imgproc.circle(displayMat, new Point(bestCircle.x, bestCircle.y), (int) bestCircle.radius, new Scalar(255,0,0),4);
+            Imgproc.putText(displayMat, "Chosen", new Point(bestCircle.x, bestCircle.y),0,.8,new Scalar(255,255,255));
             foundCircle = bestCircle;
             isFound = true;
         }else{
@@ -116,13 +117,13 @@ public class HoughSilverDetector extends DogeCVDetector {
         if(showMask){
             return whiteMask;
         }
-        Imgproc.cvtColor(workingMat2, workingMat2, Imgproc.COLOR_RGB2RGBA);
-        return workingMat2;
+        Imgproc.cvtColor(displayMat, displayMat, Imgproc.COLOR_RGB2RGBA);
+        return displayMat;
     }
 
     @Override
     public void useDefaults() {
-
+        addScorer(stdDevScorer);
     }
 
     public boolean isFound() {

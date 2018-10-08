@@ -11,13 +11,14 @@ import org.opencv.core.MatOfPoint;
  * Created by LeviG on 10/7/2018.
  */
 
-public class ColorDevScorer {
+public class ColorDevScorer extends DogeCVScorer{
 
-    private static MatOfDouble std = new MatOfDouble();
-    private static MatOfDouble mean = new MatOfDouble();
+    private MatOfDouble std = new MatOfDouble();
+    private MatOfDouble mean = new MatOfDouble();
 
-    public static double calculateDifferences(Mat region) {
-        Core.meanStdDev(region, mean, std);
+    @Override
+    public double calculateScore(Mat input) {
+        Core.meanStdDev(input, mean, std);
         return MathFTC.mean(std.get(0,0));
     }
 }
