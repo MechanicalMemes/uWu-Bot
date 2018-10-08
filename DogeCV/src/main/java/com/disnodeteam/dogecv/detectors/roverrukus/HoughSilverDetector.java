@@ -25,8 +25,6 @@ import java.util.List;
 
 public class HoughSilverDetector extends DogeCVDetector {
 
-    public final DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.COLOR_DEVIATION;
-
     public DogeCVScorer stdDevScorer = new ColorDevScorer();
 
     public double sensitivity = 1.4; //Sensitivity of circle detector; between about 1.2 and 2.1;
@@ -39,17 +37,6 @@ public class HoughSilverDetector extends DogeCVDetector {
     private Circle foundCircle;
     private boolean isFound = false;
     private boolean showMask = false;
-
-    public void setShowMask(boolean showMask) {
-        this.showMask = showMask;
-    }
-
-    public HoughSilverDetector(double sensitivity, double mindDistance, Size size) {
-        this();
-        this.setAdjustedSize(size);
-        this.sensitivity = sensitivity;
-        this.minDistance = mindDistance;
-    }
 
     public HoughSilverDetector() {
         super();
@@ -68,7 +55,6 @@ public class HoughSilverDetector extends DogeCVDetector {
         displayMat.copyTo(workingMat);
         Imgproc.cvtColor(workingMat, workingMat, Imgproc.COLOR_RGB2Lab);
 
-
         Imgproc.erode(workingMat, workingMat, Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(3,3)));
         Imgproc.GaussianBlur(workingMat, workingMat, new Size(3,3), 0);
         List<Mat> channels = new ArrayList<Mat>();
@@ -81,18 +67,16 @@ public class HoughSilverDetector extends DogeCVDetector {
         Circle bestCircle = null;
         double bestDifference = Double.MAX_VALUE;
 
-
         for (int i = 0; i < circles.width(); i++) {
             Circle circle = new Circle(circles.get(0,i)[0],circles.get(0,i)[1],circles.get(0,i)[2]);
             Mat mask = Mat.zeros(workingMat.size(), CvType.CV_8UC1);
             Imgproc.circle(mask, new Point((int) circle.x, (int) circle.y), (int) circle.radius, new Scalar(255), -1);
             Mat masked = new Mat((int) getAdjustedSize().height, (int) getAdjustedSize().width, CvType.CV_8UC3);
             workingMat.copyTo(masked, mask);
-
             double score = calculateScore(masked);
+
             mask.release();
             masked.release();
-
             results++;
 
             Imgproc.circle(displayMat, new Point(circle.x, circle.y), (int) circle.radius, new Scalar(0,0,255),2);
@@ -112,7 +96,6 @@ public class HoughSilverDetector extends DogeCVDetector {
             isFound = false;
             foundCircle = null;
         }
-
 
         if(showMask){
             return whiteMask;
