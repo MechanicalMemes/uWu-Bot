@@ -54,7 +54,6 @@ public class SilverExample extends OpMode
         detector.setAdjustedSize(new Size(480, 270));
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
         detector.useDefaults();
-        detector.setShowMask(false);
         // Optional Tuning
 
         detector.downscale = 0.4; // How much to downscale the input frames

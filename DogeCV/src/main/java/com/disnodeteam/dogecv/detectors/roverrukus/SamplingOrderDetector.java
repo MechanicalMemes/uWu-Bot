@@ -137,8 +137,11 @@ public class SamplingOrderDetector extends DogeCVDetector {
         // Prepare to find best white (silver) results
         List<Rect>   choosenWhiteRect  = new ArrayList<>(2);
         List<Double> chosenWhiteScore  = new ArrayList<>(2);
-        chosenWhiteScore.set(0, Double.MAX_VALUE);
-        chosenWhiteScore.set(1, Double.MAX_VALUE);
+        chosenWhiteScore.add(0, Double.MAX_VALUE);
+        chosenWhiteScore.add(1, Double.MAX_VALUE);
+        choosenWhiteRect.add(0, null);
+        choosenWhiteRect.add(1, null);
+
 
         for(MatOfPoint c : contoursWhite){
             MatOfPoint2f contour2f = new MatOfPoint2f(c.toArray());
@@ -169,25 +172,14 @@ public class SamplingOrderDetector extends DogeCVDetector {
 
             boolean good = true;
             if(diffrenceScore < maxDifference && area > 1000){
-                for(Rect checkRect : choosenWhiteRect){
-                    boolean inX = ( rect.x > (checkRect.x - (checkRect.width / 2))) && rect.x < (checkRect.x + (checkRect.width / 2));
-                    boolean inY = ( rect.y > (checkRect.y - (checkRect.height / 2))) && rect.y < (checkRect.y + (checkRect.height / 2));
-                    if(inX && inY){
-                        good = false;
-                    }
+
+                if(diffrenceScore < chosenWhiteScore.get(0)){
+                    choosenWhiteRect.set(0,rect);
+                    chosenWhiteScore.set(0,diffrenceScore);
                 }
-                if(good){
-
-                    //Save only top 2 results
-                    if(diffrenceScore < chosenWhiteScore.get(0)){
-                        choosenWhiteRect.set(0,rect);
-                        chosenWhiteScore.set(0,diffrenceScore);
-                    }
-                    else if(diffrenceScore < chosenWhiteScore.get(1) && diffrenceScore > chosenWhiteScore.get(0)){
-                        choosenWhiteRect.set(1,rect);
-                        chosenWhiteScore.set(1, diffrenceScore);
-                    }
-
+                else if(diffrenceScore < chosenWhiteScore.get(1) && diffrenceScore > chosenWhiteScore.get(0)){
+                    choosenWhiteRect.set(1,rect);
+                    chosenWhiteScore.set(1, diffrenceScore);
                 }
             }
 
@@ -211,9 +203,9 @@ public class SamplingOrderDetector extends DogeCVDetector {
 
         }
         //Draw found white elements
-        if(choosenWhiteRect != null){
-            for(int i=0;i<choosenWhiteRect.size();i++){
-                Rect rect = choosenWhiteRect.get(i);
+        for(int i=0;i<choosenWhiteRect.size();i++){
+            Rect rect = choosenWhiteRect.get(i);
+            if(rect != null){
                 double score = chosenWhiteScore.get(i);
                 Imgproc.rectangle(displayMat,
                         new Point(rect.x, rect.y),
@@ -226,12 +218,13 @@ public class SamplingOrderDetector extends DogeCVDetector {
                         1.3,
                         new Scalar(255, 255, 255),
                         2);
-
             }
+
+
         }
 
         // If enough elements are found, compute gold position
-        if(choosenWhiteRect.size() >= 2 && chosenYellowRect != null){
+        if(choosenWhiteRect.get(0) != null && choosenWhiteRect.get(1) != null  && chosenYellowRect != null){
             int leftCount = 0;
             for(int i=0;i<choosenWhiteRect.size();i++){
                 Rect rect = choosenWhiteRect.get(i);

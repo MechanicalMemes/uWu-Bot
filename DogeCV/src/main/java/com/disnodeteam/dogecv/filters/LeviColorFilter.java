@@ -48,12 +48,7 @@ public class LeviColorFilter extends DogeCVColorFilter {
         updateSettings(filterColor, filterThreshold);
     }
 
-    /**
-     * Update filter settings
-     * @param filterColor - Color Preset to use (RED,BLUE,YELLOW,WHITE)
-     * @param filterThreshold - Threshold value
-     */
-    public void updateSettings(ColorPreset filterColor, double filterThreshold){
+    private void updateSettings(ColorPreset filterColor, double filterThreshold){
         color = filterColor;
         threshold = filterThreshold;
     }
