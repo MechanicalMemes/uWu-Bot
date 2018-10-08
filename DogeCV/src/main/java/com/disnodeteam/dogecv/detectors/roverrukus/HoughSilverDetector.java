@@ -26,7 +26,7 @@ import java.util.List;
 public class HoughSilverDetector extends DogeCVDetector {
 
     //The scorer used for this class. Based upon minimizing the standard deviation of color within each mineral,
-    //I.e, if the region is actually a mineral it should be fairly flat.
+    //I.e, if the region is actually a mineral it should be fairly flat. (Levi is op AF - Alex)
     public DogeCVScorer stdDevScorer = new ColorDevScorer();
 
     public double sensitivity = 1.4; //Sensitivity of circle detector; between about 1.2 and 2.1;

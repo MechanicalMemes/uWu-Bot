@@ -27,19 +27,21 @@ import java.util.List;
 
 public class GoldAlignDetector extends DogeCVDetector {
 
-    private Mat displayMat = new Mat();
-    private Mat workingMat = new Mat();
-    private Mat maskYellow = new Mat();
-    private Mat hierarchy  = new Mat();
+    // Defining Mats to be used.
+    private Mat displayMat = new Mat(); // Display debug info to the screen (this is what is returned)
+    private Mat workingMat = new Mat(); // Used for preprocessing and working with (blurring as an example)
+    private Mat maskYellow = new Mat(); // Yellow Mask returned by color filter
+    private Mat hierarchy  = new Mat(); // hierarchy used by coutnours
 
+    // Results of the detector
+    private boolean found    = false; // Is the gold mineral found
+    private boolean aligned  = false; // Is the gold mineral aligned
+    private double  goldXPos = 0;     // X Position (in pixels) of the gold element
 
-    private boolean found = false;
-    private boolean aligned = false;
-    private double goldXPos = 0;
-
-    public boolean debugAlignment = true;
-    public double alignPosOffset  = 0;
-    public double alignSize       = 100;
+    // Detector settings
+    public boolean debugAlignment = true; // Show debug lines to show alignment settings
+    public double alignPosOffset  = 0;    // How far from center frame is aligned
+    public double alignSize       = 100;  // How wide is the margin of error for alignment
 
     public DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Setting to decide to use MaxAreaScorer or PerfectAreaScorer
 
@@ -47,12 +49,12 @@ public class GoldAlignDetector extends DogeCVDetector {
     //Create the default filters and scorers
     public DogeCVColorFilter yellowFilter      = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW); //Default Yellow filter
 
-    public RatioScorer       ratioScorer       = new RatioScorer(1.0, 3); // Used to find perfect squares
-    public MaxAreaScorer     maxAreaScorer     = new MaxAreaScorer( 0.01); // Used to find largest objects
+    public RatioScorer       ratioScorer       = new RatioScorer(1.0, 3);          // Used to find perfect squares
+    public MaxAreaScorer     maxAreaScorer     = new MaxAreaScorer( 0.01);                    // Used to find largest objects
     public PerfectAreaScorer perfectAreaScorer = new PerfectAreaScorer(5000,0.05); // Used to find objects near a tuned area value
 
     /**
-     *
+     * Simple constructor
      */
     public GoldAlignDetector() {
         super();
@@ -60,62 +62,71 @@ public class GoldAlignDetector extends DogeCVDetector {
     }
 
 
-
     @Override
     public Mat process(Mat input) {
-        if(input.channels() < 0 || input.cols() <= 0){
-            Log.e("DogeCV", "Bad INPUT MAT!");
 
-        }
+        // Copy the input mat to our working mats, then release it for memory
+        input.copyTo(displayMat);
         input.copyTo(workingMat);
         input.release();
 
+
+        //Preprocess the working Mat (blur it then apply a yellow filter)
         Imgproc.GaussianBlur(workingMat,workingMat,new Size(5,5),0);
         yellowFilter.process(workingMat.clone(),maskYellow);
 
+        //Find contours of the yellow mask and draw them to the display mat for viewing
+
         List<MatOfPoint> contoursYellow = new ArrayList<>();
-
         Imgproc.findContours(maskYellow, contoursYellow, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        Imgproc.drawContours(workingMat,contoursYellow,-1,new Scalar(230,70,70),2);
+        Imgproc.drawContours(displayMat,contoursYellow,-1,new Scalar(230,70,70),2);
 
-
+        // Current result
         Rect bestRect = null;
-        double bestDiffrence = Double.MAX_VALUE;
+        double bestDiffrence = Double.MAX_VALUE; // MAX_VALUE since less diffrence = better
 
+        // Loop through the contours and score them, searching for the best result
         for(MatOfPoint cont : contoursYellow){
-            double score = calculateScore(cont);
-
+            double score = calculateScore(cont); // Get the diffrence score using the scoring API
 
             // Get bounding rect of contour
             Rect rect = Imgproc.boundingRect(cont);
-            Imgproc.rectangle(workingMat, rect.tl(), rect.br(), new Scalar(0,0,255),2);
+            Imgproc.rectangle(displayMat, rect.tl(), rect.br(), new Scalar(0,0,255),2); // Draw rect
 
+            // If the result is better then the previously tracked one, set this rect as the new best
             if(score < bestDiffrence){
                 bestDiffrence = score;
                 bestRect = rect;
             }
         }
 
-
-        double alignX = (getAdjustedSize().width / 2) + alignPosOffset;
-        double alignXMin = alignX - (alignSize / 2);
-        double alignXMax = alignX +(alignSize / 2);
-        double xPos;
+        // Vars to calculate the alignment logic.
+        double alignX    = (getAdjustedSize().width / 2) + alignPosOffset; // Center point in X Pixels
+        double alignXMin = alignX - (alignSize / 2); // Min X Pos in pixels
+        double alignXMax = alignX +(alignSize / 2); // Max X pos in pixels
+        double xPos; // Current Gold X Pos
 
         if(bestRect != null){
-            Imgproc.rectangle(workingMat, bestRect.tl(), bestRect.br(), new Scalar(255,0,0),4);
-            Imgproc.putText(workingMat, "Chosen", bestRect.tl(),0,1,new Scalar(255,255,255));
+            // Show chosen result
+            Imgproc.rectangle(displayMat, bestRect.tl(), bestRect.br(), new Scalar(255,0,0),4);
+            Imgproc.putText(displayMat, "Chosen", bestRect.tl(),0,1,new Scalar(255,255,255));
 
+            // Set align X pos
             xPos = bestRect.x + (bestRect.width / 2);
             goldXPos = xPos;
-            Imgproc.circle(workingMat, new Point( xPos, bestRect.y + (bestRect.height / 2)), 5, new Scalar(0,255,0),2);
+
+            // Draw center point
+            Imgproc.circle(displayMat, new Point( xPos, bestRect.y + (bestRect.height / 2)), 5, new Scalar(0,255,0),2);
+
+            // Check if the mineral is aligned
             if(xPos < alignXMax && xPos > alignXMin){
                 aligned = true;
             }else{
                 aligned = false;
             }
-            Imgproc.line(workingMat,new Point(xPos, getAdjustedSize().height), new Point(xPos, getAdjustedSize().height - 30),new Scalar(255,255,0), 2);
-            Imgproc.putText(workingMat,"Current X: " + bestRect.x,new Point(10,getAdjustedSize().height - 10),0,0.5, new Scalar(255,255,255),1);
+
+            // Draw Current X
+            Imgproc.putText(displayMat,"Current X: " + bestRect.x,new Point(10,getAdjustedSize().height - 10),0,0.5, new Scalar(255,255,255),1);
             found = true;
         }else{
             found = false;
@@ -123,21 +134,28 @@ public class GoldAlignDetector extends DogeCVDetector {
         }
         if(debugAlignment){
 
-            Imgproc.line(workingMat,new Point(alignXMin, getAdjustedSize().height), new Point(alignXMin, getAdjustedSize().height - 40),new Scalar(0,255,0), 2);
-            Imgproc.line(workingMat,new Point(alignXMax, getAdjustedSize().height), new Point(alignXMax,getAdjustedSize().height - 40),new Scalar(0,255,0), 2);
+            //Draw debug alignment info
+            if(isFound()){
+                Imgproc.line(displayMat,new Point(goldXPos, getAdjustedSize().height), new Point(goldXPos, getAdjustedSize().height - 30),new Scalar(255,255,0), 2);
+            }
+
+            Imgproc.line(displayMat,new Point(alignXMin, getAdjustedSize().height), new Point(alignXMin, getAdjustedSize().height - 40),new Scalar(0,255,0), 2);
+            Imgproc.line(displayMat,new Point(alignXMax, getAdjustedSize().height), new Point(alignXMax,getAdjustedSize().height - 40),new Scalar(0,255,0), 2);
         }
 
+        //Print result
+        Imgproc.putText(displayMat,"Result: " + aligned,new Point(10,getAdjustedSize().height - 30),0,1, new Scalar(255,255,0),1);
 
-        Imgproc.putText(workingMat,"Result: " + aligned,new Point(10,getAdjustedSize().height - 30),0,1, new Scalar(255,255,0),1);
 
-
-        return workingMat;
+        return displayMat;
 
     }
 
     @Override
     public void useDefaults() {
         addScorer(ratioScorer);
+
+        // Add diffrent scoreres depending on the selected mode
         if(areaScoringMethod == DogeCV.AreaScoringMethod.MAX_AREA){
             addScorer(maxAreaScorer);
         }
