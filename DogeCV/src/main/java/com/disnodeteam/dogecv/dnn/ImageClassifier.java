@@ -55,6 +55,7 @@ public abstract class ImageClassifier {
     private static final int DIM_BATCH_SIZE = 1;
 
     private static final int DIM_PIXEL_SIZE = 3;
+    public  Map<Integer, Object> outputMap;
 
     /** Preallocated buffers for storing image data in. */
     private int[] intValues = new int[getImageSizeX() * getImageSizeY()];

@@ -79,10 +79,10 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
         if(workingMat.empty()){
             return rgba;
         }
-        Imgproc.resize(workingMat, workingMat,adjustedSize);
-
-        Imgproc.resize(process(workingMat),workingMat,getInitSize());
-        Imgproc.putText(workingMat,"DogeCV 2018.1 " + detectorName + ": " + getAdjustedSize().toString() + " - " + speed.toString() ,new Point(5,30),0,0.5,new Scalar(0,255,255),2);
+        Imgproc.resize(workingMat, workingMat,adjustedSize); // Downscale
+        Imgproc.resize(process(workingMat),workingMat,getInitSize()); // Process and scale back to original size for viewing
+        //Print Info
+        Imgproc.putText(workingMat,"DogeCV 2018.2 " + detectorName + ": " + getAdjustedSize().toString() + " - " + speed.toString() ,new Point(5,30),0,0.5,new Scalar(0,255,255),2);
 
         return workingMat;
     }

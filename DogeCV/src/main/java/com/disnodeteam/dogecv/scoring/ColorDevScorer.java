@@ -11,7 +11,7 @@ import org.opencv.core.MatOfPoint;
  * Created by LeviG on 10/7/2018.
  */
 
-public class ColorDevScorer {
+public class ColorDevScorer  extends {
 
     private static MatOfDouble std = new MatOfDouble();
     private static MatOfDouble mean = new MatOfDouble();

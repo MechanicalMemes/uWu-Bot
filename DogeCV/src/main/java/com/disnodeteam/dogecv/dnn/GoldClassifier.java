@@ -16,7 +16,7 @@ public class GoldClassifier extends ImageClassifier {
     private float[][] labelProbArray = null;
     private static final int IMAGE_MEAN = 128;
     private static final float IMAGE_STD = 128.0f;
-    public  Map<Integer, Object> outputMap;
+
 
     public GoldClassifier(Activity activity) throws IOException {
         super(activity);
