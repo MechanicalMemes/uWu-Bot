@@ -29,6 +29,11 @@ import java.io.IOException;
 public class DNNDetector extends DogeCVDetector {
 
 
+    /*
+    THIS IS WIP DETECTOR. THIS IS OFFICIALLY UNSUPPORTED AS OF 2018.2 WITH THE FULL RELEASE PLANNED
+    FOR 2018.3. USE AT YOUR OWN RISK
+    */
+
     private Mat displayMat = new Mat();
     private Mat dnnInout = new Mat();
     private Bitmap bitmap;
