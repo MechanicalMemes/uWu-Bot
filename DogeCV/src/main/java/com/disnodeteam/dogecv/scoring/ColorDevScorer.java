@@ -16,6 +16,10 @@ public class ColorDevScorer extends DogeCVScorer{
     private MatOfDouble std = new MatOfDouble();
     private MatOfDouble mean = new MatOfDouble();
 
+    /**
+     * @param input - Input mat
+     * @return - Difference from perfect score
+     */
     @Override
     public double calculateScore(Mat input) {
         Core.meanStdDev(input, mean, std);

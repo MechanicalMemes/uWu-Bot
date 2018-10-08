@@ -12,12 +12,20 @@ import org.opencv.imgproc.Imgproc;
 
 public class MaxAreaScorer extends DogeCVScorer{
     public double weight       = 1.0;
-
+    /**
+     * Constructor
+     * @param weight - How much to weight the final score (1-10 is usually good)
+     */
     public MaxAreaScorer( double weight){
         this.weight = weight;
 
     }
 
+    /**
+     * Calculate the score
+     * @param input - Input mat (Can be MatOfPoint for contours)
+     * @return - Difference from perfect score
+     */
     @Override
     public double calculateScore(Mat input) {
         if(!(input instanceof MatOfPoint)) return Double.MAX_VALUE;

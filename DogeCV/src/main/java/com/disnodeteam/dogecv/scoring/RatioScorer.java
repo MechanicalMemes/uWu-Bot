@@ -20,11 +20,20 @@ public class RatioScorer extends DogeCVScorer{
     public RatioScorer(){
 
     }
+
+    /**
+     * Constructor
+     * @param perfectRatio - Perfect ratio of height / width (abs value)
+     * @param weight - How much to weight the final score (1-10 is usually good)
+     */
     public RatioScorer(double perfectRatio, double weight){
         this.weight = weight;
         this.perfectRatio = perfectRatio;
     }
-
+    /**
+     * @param input - Input mat (Can be MatOfPoint for contours)
+     * @return - Difference from perfect score
+     */
     @Override
     public double calculateScore(Mat input) {
         if(!(input instanceof MatOfPoint)) return Double.MAX_VALUE;
