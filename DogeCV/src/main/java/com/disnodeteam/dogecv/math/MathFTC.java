@@ -1,9 +1,5 @@
 package com.disnodeteam.dogecv.math;
 
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,6 +75,11 @@ public class MathFTC {
         return combos;
     }
 
+    /**
+     * Returns the standard deviation of a sample set
+     * @param samples A list of Doubles
+     * @return Sigma (i.e. the standard deviation)
+     */
     public static double getStdDev(List<Double> samples) {
         if(samples.size() == 0) return 0;
         double mean = 0;
@@ -93,24 +94,14 @@ public class MathFTC {
         return Math.sqrt(sigma/(samples.size() - 1));
     }
 
+    /**
+     * Normalizes an angle to always return between 0 and 180 degrees
+     * @param angle Input angle, in degrees
+     * @return Noramlized angle, in degrees
+     */
     public static double normalizeAngle(double angle) {
         angle = angle % 180;
         if (angle > 0) return angle;
         else return angle+180;
-    }
-
-    public static MatOfPoint MatFromCircle(Circle circle) {
-        if (circle.radius < 4) return null;
-        Point[] points = new Point[8];
-        points[0] = new Point((int) (circle.x), (int) (circle.y-circle.radius));
-        points[1] = new Point((int) (circle.x+0.707*circle.radius), (int) (circle.y-0.707*circle.radius));
-        points[2] = new Point((int) (circle.x+circle.radius), (int) (circle.y));
-        points[3] = new Point((int) (circle.x+0.707*circle.radius), (int) (circle.y+0.707*circle.radius));
-        points[4] = new Point((int) (circle.x), (int) (circle.y+circle.radius));
-        points[5] = new Point((int) (circle.x-0.707*circle.radius), (int) (circle.y+0.707*circle.radius));
-        points[6] = new Point((int) (circle.x-circle.radius), (int) (circle.y));
-        points[6] = new Point((int) (circle.x-0.707*circle.radius), (int) (circle.y-0.707*circle.radius));
-        MatOfPoint contour = new MatOfPoint(points);
-        return contour;
     }
 }

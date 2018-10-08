@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 import static com.vuforia.Vuforia.setFrameFormat;
 
 /**
- * Created by Victo on 9/12/2018.
+ * An implementation of Vuforia intended to be cross-compatible with OpenCV (and DogeCV by extension)
  */
 
 public class Dogeforia extends VuforiaLocalizerImpl {
