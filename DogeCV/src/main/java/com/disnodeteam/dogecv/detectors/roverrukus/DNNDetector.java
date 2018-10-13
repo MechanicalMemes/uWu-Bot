@@ -49,9 +49,6 @@ public class DNNDetector extends DogeCVDetector {
 
     @Override
     public Mat process(Mat input) {
-        if(input.channels() < 0 || input.cols() <= 0){
-            Log.e("DogeCV", "Bad INPUT MAT!");
-        }
         input.copyTo(displayMat);
         Imgproc.resize(displayMat, dnnInout, new Size(300,300));
         if(bitmap == null){
