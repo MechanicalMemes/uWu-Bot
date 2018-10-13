@@ -3,12 +3,14 @@ package com.disnodeteam.dogecv.detectors.roverrukus;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.ImageFormat;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
 
 import com.disnodeteam.dogecv.dnn.GoldClassifier;
 import com.disnodeteam.dogecv.ViewDisplay;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
+import com.disnodeteam.dogecv.dnn.ImageClassifier;
 import com.disnodeteam.dogecv.dnn.SilverClassifier;
 
 import org.opencv.android.Utils;
@@ -27,10 +29,20 @@ import java.io.IOException;
 public class DNNDetector extends DogeCVDetector {
 
 
+    /*
+    THIS IS WIP DETECTOR. THIS IS OFFICIALLY UNSUPPORTED AS OF 2018.2 WITH THE FULL RELEASE PLANNED
+    FOR 2018.3. USE AT YOUR OWN RISK
+    */
+
     private Mat displayMat = new Mat();
     private Mat dnnInout = new Mat();
     private Bitmap bitmap;
-    private GoldClassifier dnn;
+    private ImageClassifier classifier;
+
+    public enum DNNObject {GOLD,SILVER};
+
+    public DNNObject objectToFind = DNNObject.GOLD;
+
     public DNNDetector() {
         super();
         this.detectorName = "DNN Detector";
@@ -41,7 +53,15 @@ public class DNNDetector extends DogeCVDetector {
     public void init(Context context, ViewDisplay viewDisplay) {
         super.init(context, viewDisplay);
         try {
-            dnn = new GoldClassifier((Activity)context);
+            switch (objectToFind) {
+                case GOLD:
+                    classifier = new GoldClassifier((Activity)context);
+
+                    break;
+                case SILVER:
+                    classifier = new SilverClassifier((Activity)context);
+                    break;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,10 +77,10 @@ public class DNNDetector extends DogeCVDetector {
         if(bitmap != null){
             Utils.matToBitmap(dnnInout, bitmap);
             SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
-            dnn.classifyFrame(bitmap,stringBuilder);
+            classifier.classifyFrame(bitmap,stringBuilder);
 
-            float[][] locations = ((float[][][]) dnn.outputMap.get(0))[0];
-            float[] scores = ((float[][]) dnn.outputMap.get(2))[0];
+            float[][] locations = ((float[][][]) classifier.outputMap.get(0))[0];
+            float[] scores = ((float[][]) classifier.outputMap.get(2))[0];
 
             for(int i=0;i<locations.length;i++){
                 float[] location = locations[i];

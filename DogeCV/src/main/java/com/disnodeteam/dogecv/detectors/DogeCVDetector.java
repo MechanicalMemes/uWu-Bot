@@ -1,14 +1,9 @@
 package com.disnodeteam.dogecv.detectors;
 
-import android.app.Activity;
-import android.view.Surface;
-import android.view.View;
-
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.OpenCVPipeline;
 import com.disnodeteam.dogecv.scoring.DogeCVScorer;
 
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -32,7 +27,7 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
     private Size initSize;
     private Size adjustedSize;
     private Mat workingMat = new Mat();
-    public double maxDiffrence = 10;
+    public double maxDifference = 10;
 
     public DogeCV.DetectionSpeed speed = DogeCV.DetectionSpeed.BALANCED;
     public double downscale = 0.5;
@@ -52,11 +47,11 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
         scorers.add(newScorer);
     }
 
-    public double calculateScore(MatOfPoint contours){
+    public double calculateScore(Mat input){
         double totalScore = 0;
 
         for(DogeCVScorer scorer : scorers){
-            totalScore += scorer.calculateDifference(contours);
+            totalScore += scorer.calculateScore(input);
         }
 
         return totalScore;
@@ -66,7 +61,7 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
 
     @Override
     public Mat processFrame(Mat rgba, Mat gray) {
-        initSize= rgba.size();
+        initSize = rgba.size();
 
         if(useFixedDownscale){
             adjustedSize = downscaleResolution;
@@ -79,10 +74,10 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
         if(workingMat.empty()){
             return rgba;
         }
-        Imgproc.resize(workingMat, workingMat,adjustedSize);
-
-        Imgproc.resize(process(workingMat),workingMat,getInitSize());
-        Imgproc.putText(workingMat,"DogeCV 2018.1 " + detectorName + ": " + getAdjustedSize().toString() + " - " + speed.toString() ,new Point(5,30),0,0.5,new Scalar(0,255,255),2);
+        Imgproc.resize(workingMat, workingMat,adjustedSize); // Downscale
+        Imgproc.resize(process(workingMat),workingMat,getInitSize()); // Process and scale back to original size for viewing
+        //Print Info
+        Imgproc.putText(workingMat,"DogeCV 2018.2 " + detectorName + ": " + getAdjustedSize().toString() + " - " + speed.toString() ,new Point(5,30),0,0.5,new Scalar(0,255,255),2);
 
         return workingMat;
     }
@@ -94,4 +89,6 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
     public Size getAdjustedSize() {
         return adjustedSize;
     }
+
+    public void setAdjustedSize(Size size) { this.adjustedSize = size; }
 }
