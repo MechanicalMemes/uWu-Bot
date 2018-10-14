@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.TensorFlowLite;
 
 /**
  * Classifies images with Tensorflow Lite.
@@ -61,7 +62,7 @@ public abstract class ImageClassifier {
     private int[] intValues = new int[getImageSizeX() * getImageSizeY()];
 
     /** Options for configuring the Interpreter. */
-  // private final Interpreter.Options tfliteOptions = new Interpreter.Options();
+   //  private final  tfliteOptions = new Interpreter.Options();
 
     /** The loaded TensorFlow Lite model. */
     private MappedByteBuffer tfliteModel;
@@ -94,7 +95,7 @@ public abstract class ImageClassifier {
     /** Initializes an {@code ImageClassifier}. */
     ImageClassifier(Activity activity) throws IOException {
         tfliteModel = loadModelFile(activity);
-        tflite = new Interpreter(tfliteModel);
+        tflite = new Interpreter(tfliteModel,2);
         labelList = loadLabelList(activity);
         imgData =
                 ByteBuffer.allocateDirect(
@@ -105,6 +106,7 @@ public abstract class ImageClassifier {
                                 * getNumBytesPerChannel());
         imgData.order(ByteOrder.nativeOrder());
         filterLabelProbArray = new float[FILTER_STAGES][getNumLabels()];
+
         Log.d(TAG, "Created a Tensorflow Lite Image Classifier.");
     }
 

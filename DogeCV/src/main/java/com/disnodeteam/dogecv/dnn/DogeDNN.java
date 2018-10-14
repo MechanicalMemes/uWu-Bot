@@ -42,6 +42,7 @@ public class DogeDNN {
 
         imgData = ByteBuffer.allocateDirect(1 * getImageSizeX() * getImageSizeY() * 3 * 1);
         imgData.order(ByteOrder.nativeOrder());
+        
     }
 
     public byte[][] runMat(Bitmap input){

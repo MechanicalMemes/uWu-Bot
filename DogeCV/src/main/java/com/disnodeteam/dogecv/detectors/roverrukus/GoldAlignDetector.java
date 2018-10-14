@@ -1,8 +1,17 @@
 package com.disnodeteam.dogecv.detectors.roverrukus;
 
+import android.app.Activity;
+import android.graphics.Color;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.disnodeteam.dogecv.DogeCV;
+import com.disnodeteam.dogecv.DogeCVTuning;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
@@ -42,6 +51,9 @@ public class GoldAlignDetector extends DogeCVDetector {
     public boolean debugAlignment = true; // Show debug lines to show alignment settings
     public double alignPosOffset  = 0;    // How far from center frame is aligned
     public double alignSize       = 100;  // How wide is the margin of error for alignment
+    public boolean showMask       = false; // Show the mask on the display mat;
+    public boolean enableTuning   = false;
+
 
     public DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Setting to decide to use MaxAreaScorer or PerfectAreaScorer
 
@@ -61,6 +73,91 @@ public class GoldAlignDetector extends DogeCVDetector {
         detectorName = "Gold Align Detector"; // Set the detector name
     }
 
+    @Override
+    public void enable() {
+        super.enable();
+        if(enableTuning){
+            enableTuning();
+        }
+    }
+
+    @Override
+    public void disable() {
+        super.disable();
+        if(enableTuning){
+            disableTuning();
+        }
+    }
+
+    private void enableTuning(){
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ViewGroup view = DogeCVTuning.setUpView(context);
+                DogeCVTuning.createButton(view, context, "Toggle Mask", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        showMask = !showMask;
+                    }
+                });
+
+
+                final TextView colorThresText = DogeCVTuning.creatText(view, context, "ColorFilterThreshold: "+((LeviColorFilter)yellowFilter).getThreshold());
+                DogeCVTuning.creatSeek(view, context, 255, (int)((LeviColorFilter)yellowFilter).getThreshold(),new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                        ((LeviColorFilter)yellowFilter).updateSettings(LeviColorFilter.ColorPreset.YELLOW, i);
+                        colorThresText.setText("ColorFilterThreshold: " + i);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {}
+                });
+
+                final TextView alignOffsetText = DogeCVTuning.creatText(view, context, "AlignOffset: "+alignPosOffset);
+                DogeCVTuning.creatSeek(view, context, 1000, (int)alignPosOffset + 500, new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                        alignPosOffset = i - 500;
+                        alignOffsetText.setText("AlignOffset: " + alignPosOffset);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {}
+                });
+
+                final TextView alignSizeText = DogeCVTuning.creatText(view, context, "AlignSize: "+alignSize);
+                DogeCVTuning.creatSeek(view, context, 1000, (int)alignSize, new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                        alignSize = i;
+                        alignSizeText.setText("AlignSize: " + alignSize);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {}
+                });
+            }
+        });
+    }
+
+    private void disableTuning(){
+        ((Activity)context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                DogeCVTuning.clear(context);
+            }
+        });
+    }
 
     @Override
     public Mat process(Mat input) {
@@ -75,6 +172,9 @@ public class GoldAlignDetector extends DogeCVDetector {
         Imgproc.GaussianBlur(workingMat,workingMat,new Size(5,5),0);
         yellowFilter.process(workingMat.clone(),maskYellow);
 
+        if(showMask){
+            maskYellow.copyTo(displayMat);
+        }
         //Find contours of the yellow mask and draw them to the display mat for viewing
 
         List<MatOfPoint> contoursYellow = new ArrayList<>();

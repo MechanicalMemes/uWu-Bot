@@ -48,10 +48,12 @@ public class LeviColorFilter extends DogeCVColorFilter {
         updateSettings(filterColor, filterThreshold);
     }
 
-    private void updateSettings(ColorPreset filterColor, double filterThreshold){
+    public void updateSettings(ColorPreset filterColor, double filterThreshold){
         color = filterColor;
         threshold = filterThreshold;
     }
+
+
 
     /**
      * Process a image and return a mask
@@ -118,4 +120,7 @@ public class LeviColorFilter extends DogeCVColorFilter {
 
     // RED FILTER
 
+    public double getThreshold() {
+        return threshold;
+    }
 }

@@ -14,8 +14,8 @@ import java.util.List;
 public class TankDriveSubsystem extends DogeSubsystem {
 
     private double speed = 1.0;
-    private DcMotor.RunMode runMode = DcMotor.RunMode.RUN_USING_ENCODER;
-    private DcMotor.Direction leftDirection = DcMotor.Direction.REVERSE;
+    private DcMotor.RunMode   runMode        = DcMotor.RunMode.RUN_USING_ENCODER;
+    private DcMotor.Direction leftDirection  = DcMotor.Direction.REVERSE;
     private DcMotor.Direction rightDirection = DcMotor.Direction.FORWARD;
     private List<DcMotor> leftMotors  = new ArrayList<>();
     private List<DcMotor> rightMotors = new ArrayList<>();
@@ -76,7 +76,7 @@ public class TankDriveSubsystem extends DogeSubsystem {
         }
     }
 
-    public void setTargetPosition(double left, double right){
+    public void setTargetPosition(int left, int right){
         for(DcMotor motor : leftMotors){
             motor.setTargetPosition(left);
         }

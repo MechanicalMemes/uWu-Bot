@@ -1,6 +1,16 @@
 package com.disnodeteam.dogecv.detectors.roverrukus;
 
+import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
@@ -37,7 +47,7 @@ public class HoughSilverDetector extends DogeCVDetector {
     private int results; //How many potential minerals were detected
     private Circle foundCircle; //The best detection found, if any
     private boolean isFound = false; //Whether a circle has been found at all
-
+    private boolean showMask = false;
     /**
      * Simple constructor.
      */
@@ -45,7 +55,67 @@ public class HoughSilverDetector extends DogeCVDetector {
         super();
         this.detectorName = "Hough Silver Detector";
     }
+    public void enableTuning(){
+        final int resID = context.getResources().getIdentifier("RelativeLayout", "id", context.getPackageName());
+        final Activity activity = (Activity) context;
 
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ViewGroup l = (ViewGroup) activity.findViewById(resID); //R.id.RelativeLayout);
+                final LinearLayout tuneLayout = new LinearLayout(context);
+                tuneLayout.setBackgroundColor(Color.WHITE);
+                tuneLayout.setOrientation(LinearLayout.VERTICAL);
+                tuneLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                final Button showMaskButton = new Button(context);
+                showMaskButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                showMaskButton.setText("Toggle Mask");
+                showMaskButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        showMask = !showMask;
+                    }
+                });
+
+                final TextView sensitivityText = new TextView(context);
+                final SeekBar sensitivitySeek = new SeekBar(context);
+                sensitivitySeek.setMax(100);
+                sensitivitySeek.setProgress(50);
+                sensitivityText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                sensitivitySeek.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                sensitivityText.setText("Sensitivity: " + sensitivity);
+                sensitivityText.setTextColor(Color.BLACK);
+
+                sensitivitySeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                        double min = 1.2;
+                        double max = 2.1;
+                        double value = (i/100) * (max-min) +min;
+                        sensitivity = value;
+                        sensitivityText.setText("Sensitivity: " + value);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+
+                tuneLayout.addView(sensitivitySeek);
+                tuneLayout.addView(sensitivityText);
+                tuneLayout.addView(showMaskButton);
+                l.addView(tuneLayout);
+
+            }
+        });
+    }
     @Override
     public Mat process(Mat input) {
         if(input.channels() < 0 || input.cols() <= 0){
@@ -79,6 +149,7 @@ public class HoughSilverDetector extends DogeCVDetector {
             workingMat.copyTo(masked, mask); //Copies only the regions of the input image contained in the mask, and therefore the circle drawn in the mask
             double score = calculateScore(masked); //Calculates the score of the circle
             //Releases undeeded matrices to avoid memory leak
+
             mask.release();
             masked.release();
             results++; //Increments circle count by one
@@ -103,6 +174,7 @@ public class HoughSilverDetector extends DogeCVDetector {
         //The ActivityViewDisplay accepts RGBA images, so converts to that format
         Imgproc.cvtColor(displayMat, displayMat, Imgproc.COLOR_RGB2RGBA);
         return displayMat;
+
     }
 
     @Override

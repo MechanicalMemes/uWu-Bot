@@ -55,13 +55,14 @@ public class HoughSilverExample extends OpMode
         detector.minDistance = 60; //Minimum distance between silver mineral centers in pixels
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance());
         detector.useDefaults();
+
         // Optional Tuning
 
         detector.downscale = 0.4; // How much to downscale the input frames
 
         detector.enable();
 
-
+        detector.enableTuning();
     }
 
     @Override

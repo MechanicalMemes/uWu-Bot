@@ -52,7 +52,7 @@ public abstract class OpenCVPipeline implements CameraBridgeViewBase.CvCameraVie
     }
     protected JavaCameraView cameraView;
     protected DrawViewSource rawView;
-    private ViewDisplay viewDisplay;
+    protected ViewDisplay viewDisplay;
     protected Context context;
     private boolean initStarted = false;
     private boolean inited = false;
@@ -204,4 +204,6 @@ public abstract class OpenCVPipeline implements CameraBridgeViewBase.CvCameraVie
      * @return the Mat that should be displayed to the screen; in most cases one would probably just want to return rgba
      */
     public abstract Mat processFrame(Mat rgba, Mat gray);
+
+
 }

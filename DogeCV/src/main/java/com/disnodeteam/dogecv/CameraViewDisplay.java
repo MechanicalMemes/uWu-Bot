@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 
 
 /**
@@ -64,8 +65,9 @@ public class CameraViewDisplay implements ViewDisplay {
                 if (view != null) {
                     l.removeView(view);
                 }
-                l.addView(new ScrollView(context));
+
                 l.addView(queuedView);
+
                 view = queuedView;
             }
         });
