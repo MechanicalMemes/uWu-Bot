@@ -12,7 +12,7 @@ import java.util.HashMap;
 public abstract class DogeBot {
     public HardwareMap hardwareMap;
     public HashMap<String, DogeSubsystem> subsystems = new HashMap<>();
-
+    public int ticksPerInch = 500;
     public DogeBot(HardwareMap hwd){
         hardwareMap = hwd;
     }

@@ -65,4 +65,48 @@ public class TankDriveSubsystem extends DogeSubsystem {
     public DcMotor.RunMode getRunMode() {
         return runMode;
     }
+
+    public void setPower(double left, double right){
+        for(DcMotor motor : leftMotors){
+            motor.setPower(left * speed);
+        }
+
+        for(DcMotor motor : rightMotors){
+            motor.setPower(right * speed);
+        }
+    }
+
+    public void setTargetPosition(double left, double right){
+        for(DcMotor motor : leftMotors){
+            motor.setTargetPosition(left);
+        }
+
+        for(DcMotor motor : rightMotors){
+            motor.setTargetPosition(right);
+        }
+    }
+
+    public List<DcMotor> getLeftMotors(){
+        return leftMotors;
+    }
+
+    public List<DcMotor> getRightMotors() {
+        return rightMotors;
+    }
+
+    public boolean isMotorsBusy(){
+        boolean isBusy = false;
+        for(DcMotor motor: leftMotors){
+            if(motor.isBusy()){
+                isBusy = true;
+            }
+        }
+
+        for(DcMotor motor: rightMotors){
+            if(motor.isBusy()){
+                isBusy = true;
+            }
+        }
+        return isBusy;
+    }
 }
