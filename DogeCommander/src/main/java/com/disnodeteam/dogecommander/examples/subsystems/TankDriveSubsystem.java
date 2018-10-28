@@ -86,12 +86,20 @@ public class TankDriveSubsystem extends DogeSubsystem {
         }
     }
 
-    public List<DcMotor> getLeftMotors(){
+    public List<DcMotor> getLeftMotorsPower(){
         return leftMotors;
     }
 
-    public List<DcMotor> getRightMotors() {
+    public List<DcMotor> getRightMotorsPower() {
         return rightMotors;
+    }
+
+    public int getLeftMotorsPosition(int index){
+        return leftMotors.get(index).getCurrentPosition();
+    }
+
+    public int getRightMotorsPositionAvg(int index) {
+        return rightMotors.get(index).getCurrentPosition();
     }
 
     public boolean isMotorsBusy(){

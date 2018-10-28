@@ -27,45 +27,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.dogecommander;
+package org.firstinspires.ftc.teamcode.opmodes.auton;
 
 import com.disnodeteam.dogecommander.auto.DogeCommander;
+import com.disnodeteam.dogecommander.examples.subsystems.TankDriveTurnPID;
+import com.disnodeteam.dogecommander.utils.PIDSettings;
+import com.disnodeteam.dogecv.CameraViewDisplay;
+import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
-/**
- * This file contains an example of an iterative (Non-Linear) "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all iterative OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
+import org.firstinspires.ftc.teamcode.dogecommander.UWUBot;
 
-@TeleOp(name="Commander Test", group="Iterative Opmode")
-public class CommandeTest extends LinearOpMode
-{
+@Autonomous(name="Commander Gyro Test", group="DogeCommander")
 
-    private ElapsedTime runtime = new ElapsedTime();
-    private TestBot bot;
-    @Override
-    public void runOpMode() throws InterruptedException {
-        bot = new TestBot(hardwareMap);
+public class CommanderGyroTest extends LinearOpMode {
 
-        DogeCommander commander = new DogeCommander();
+    private UWUBot bot;
+    private DogeCommander commander;
+    public void runOpMode() {
 
-        commander.setBot(bot);
+        bot = new UWUBot(hardwareMap);
+        commander = new DogeCommander();
         commander.usingLinearOpMode(this);
+        commander.setBot(bot);
 
         waitForStart();
+        PIDSettings settings = new PIDSettings();
+        settings.set(0.5,0,0);
+        commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,90,0.5,settings));
 
-        commander.runCommand(new TestCommand());
+        commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,-90,0.5,settings));
+
+        commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,45,0.5,settings));
+        requestOpModeStop();
     }
+
 
 }

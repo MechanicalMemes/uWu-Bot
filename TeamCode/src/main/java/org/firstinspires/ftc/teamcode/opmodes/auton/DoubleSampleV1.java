@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes.auton;
 
 import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
@@ -41,9 +41,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@Autonomous(name="Yett", group="Linear Opmode")
+@Autonomous(name="Double Sample V1", group="Double Sample")
 
-public class Auton extends LinearOpMode {
+public class DoubleSampleV1 extends LinearOpMode {
 
     // Declare OpMode members.
 
@@ -135,7 +135,7 @@ public class Auton extends LinearOpMode {
         }
         setAllMotors(0);
 
-        moveEncoder(400 , 40cff0, 0.6);
+        moveEncoder(400 , 400, 0.6);
         while( motorsBusy() && !isStopRequested()){
             telemetry.addData("Status","Scoring");
             telemetry.update();
