@@ -22,7 +22,7 @@ public abstract class DogeBot {
     }
 
     public void addSubsystem(DogeSubsystem subsystem) {
-        UniLogger.Log("DogeCommander", "Adding system subsystems: " + this.getClass().getSimpleName() + "/" + subsystem.name);
+        UniLogger.Log("DogeCommander-Bot", "Adding system subsystems: " + this.getClass().getSimpleName() + "/" + subsystem.name);
         subsystems.put(subsystem.name, subsystem);
     }
 
@@ -32,12 +32,12 @@ public abstract class DogeBot {
     }
 
     private void hardwareInit(){
-        UniLogger.Log("DogeCommander", "Running hardwareInit for subsystems: " + this.getClass().getSimpleName());
+        UniLogger.Log("DogeCommander-Bot", "Running hardwareInit for subsystems: " + this.getClass().getSimpleName());
 
 
         for(DogeSubsystem subsystem : subsystems.values()){
             subsystem.hardwareInit(hardwareMap);
-            UniLogger.Log("DogeCommander", "Ran hardwareInit for subsystems: " + this.getClass().getSimpleName() + "/" + subsystem.name);
+            UniLogger.Log("DogeCommander-Bot", "Ran hardwareInit for subsystems: " + this.getClass().getSimpleName() + "/" + subsystem.name);
         }
     }
 }

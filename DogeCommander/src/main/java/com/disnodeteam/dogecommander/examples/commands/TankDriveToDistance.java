@@ -7,27 +7,23 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class TankDriveToDistance extends DogeCommand {
     TankDriveSubsystem tankDrive;
-    String tankDriveName;
+
     boolean enabled = false;
     int target;
-    public TankDriveToDistance(String tankDriveName, double distanceInInches) {
-        this.tankDriveName = tankDriveName;
+    double speed;
+    public TankDriveToDistance(TankDriveSubsystem tankDrive, double distanceInInches, double speed) {
+        this.tankDrive = tankDrive;
         this.target = (int) distanceInInches * bot.ticksPerInch;
+        this.speed = speed;
     }
 
     @Override
     public void start() {
-        tankDrive = (TankDriveSubsystem)bot.getSubSystem(tankDriveName);
-        if(tankDrive != null){
-            enabled = true;
-        }else{
-            UniLogger.Log("DogeCommander", "Cant run TankDriveToDistance. Cannot find subsystem "+ tankDriveName);
-            return;
-        }
+
 
         tankDrive.setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
         tankDrive.setTargetPosition(target, target);
-        tankDrive.setPower(1.0, 1.0);
+        tankDrive.setPower(speed, speed);
     }
 
     @Override

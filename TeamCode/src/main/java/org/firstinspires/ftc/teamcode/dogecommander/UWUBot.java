@@ -20,5 +20,7 @@ public class UWUBot extends DogeBot {
         navigationHardware = new REVImu(navName,"imu1");
         addSubsystem(tankDrive);
         addSubsystem(navigationHardware);
+
+        ticksPerInch = (int) ((int)1440 * 3.14 * 4);
     }
 }

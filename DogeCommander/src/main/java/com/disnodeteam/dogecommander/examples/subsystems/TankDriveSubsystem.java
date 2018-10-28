@@ -78,11 +78,11 @@ public class TankDriveSubsystem extends DogeSubsystem {
 
     public void setTargetPosition(int left, int right){
         for(DcMotor motor : leftMotors){
-            motor.setTargetPosition(left);
+            motor.setTargetPosition(left + motor.getCurrentPosition());
         }
 
         for(DcMotor motor : rightMotors){
-            motor.setTargetPosition(right);
+            motor.setTargetPosition(right + motor.getCurrentPosition());
         }
     }
 
@@ -103,16 +103,16 @@ public class TankDriveSubsystem extends DogeSubsystem {
     }
 
     public boolean isMotorsBusy(){
-        boolean isBusy = false;
+        boolean isBusy = true;
         for(DcMotor motor: leftMotors){
-            if(motor.isBusy()){
-                isBusy = true;
+            if(!motor.isBusy()){
+                isBusy = false;
             }
         }
 
         for(DcMotor motor: rightMotors){
-            if(motor.isBusy()){
-                isBusy = true;
+            if(!motor.isBusy()){
+                isBusy = false;
             }
         }
         return isBusy;

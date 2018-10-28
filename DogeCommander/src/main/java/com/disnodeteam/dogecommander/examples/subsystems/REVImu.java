@@ -35,7 +35,8 @@ public class REVImu extends DogeSubsystem implements NavigationHardware {
     @Override
     public double getHeading() {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return (angles.firstAngle+360)%360;
+
+        return (angles.firstAngle);
     }
 
     @Override

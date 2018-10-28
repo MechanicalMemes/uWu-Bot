@@ -30,19 +30,11 @@
 package org.firstinspires.ftc.teamcode.opmodes.auton;
 
 import com.disnodeteam.dogecommander.auto.DogeCommander;
-import com.disnodeteam.dogecommander.examples.subsystems.TankDriveTurnPID;
+import com.disnodeteam.dogecommander.examples.commands.TankDriveTurnPID;
+import com.disnodeteam.dogecommander.examples.commands.WaitForTime;
 import com.disnodeteam.dogecommander.utils.PIDSettings;
-import com.disnodeteam.dogecv.CameraViewDisplay;
-import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.dogecommander.UWUBot;
 
@@ -61,11 +53,11 @@ public class CommanderGyroTest extends LinearOpMode {
 
         waitForStart();
         PIDSettings settings = new PIDSettings();
-        settings.set(0.5,0,0);
+        settings.set(0.1,0.1,0.1);
         commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,90,0.5,settings));
-
+        commander.runCommand(new WaitForTime(1.0));
         commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,-90,0.5,settings));
-
+        commander.runCommand(new WaitForTime(1.0));
         commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,45,0.5,settings));
         requestOpModeStop();
     }

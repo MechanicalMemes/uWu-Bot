@@ -32,6 +32,7 @@ public class DogeCommander {
 
     public void usingLinearOpMode(LinearOpMode opMode){
         linearOpMode = opMode;
+        UniLogger.setTele(opMode.telemetry);
         UniLogger.Log(TAG, "Set to use Linear opMode");
     }
 
@@ -58,10 +59,11 @@ public class DogeCommander {
             command.start();
         }
 
-        while(!halt && !getOpModeStop() && !isTaskRunningInStack()){
+        while(!halt && !getOpModeStop() && isTaskRunningInStack()){
             for(DogeCommand command : commands){
                 command.loop();
             }
+//           / UniLogger.Log(TAG, "LOOPING");
 
         }
 

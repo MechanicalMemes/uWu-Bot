@@ -29,73 +29,36 @@
 
 package org.firstinspires.ftc.teamcode.opmodes.auton;
 
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.acmerobotics.roadrunner.drive.TankDrive;
-import com.acmerobotics.roadrunner.followers.TankPIDVAFollower;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryLoader;
 import com.disnodeteam.dogecommander.auto.DogeCommander;
+import com.disnodeteam.dogecommander.examples.commands.TankDriveToDistance;
+import com.disnodeteam.dogecommander.utils.PIDSettings;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.dogecommander.UWUBot;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+@Autonomous(name="Commander Distance Test", group="DogeCommander")
 
-@Autonomous(name="Roadrunner Test", group="DogeCommander")
-
-public class RoadrunnerTest extends LinearOpMode {
+public class CommanderDistanceTest extends LinearOpMode {
 
     private UWUBot bot;
     private DogeCommander commander;
-
-    private TankDrive tankDriveRoadRunner;
-    TankPIDVAFollower follower;
     public void runOpMode() {
 
         bot = new UWUBot(hardwareMap);
+
         commander = new DogeCommander();
         commander.usingLinearOpMode(this);
         commander.setBot(bot);
 
-        Trajectory trajectory = TrajectoryLoader.load(new File("trajectory/Test1.yaml"));
-
-
-        tankDriveRoadRunner = new TankDrive(16) {
-            @Override
-            public void setMotorPowers(double v, double v1) {
-                bot.tankDrive.setPower(v, v1);
-            }
-
-            @NotNull
-            @Override
-            public List<Double> getWheelPositions() {
-                List<Double> pos = new ArrayList<>();
-                pos.add((double)bot.tankDrive.getLeftMotorsPosition(0));
-                pos.add((double)bot.tankDrive.getRightMotorsPositionAvg(0));
-                return pos;
-            }
-        };
-        follower = new TankPIDVAFollower(tankDriveRoadRunner,new PIDCoefficients(0.5,0.1,0.2),new PIDCoefficients(0.5,0.1,0.1),25,40,0);
-
-
 
         waitForStart();
-
-        follower.followTrajectory(trajectory);
-        while (opModeIsActive() && follower.isFollowing()) {
-            Pose2d currentPose = tankDriveRoadRunner.getPoseEstimate();
-
-            follower.update(currentPose);
-            
-        }
-
+        PIDSettings settings = new PIDSettings();
+        commander.runCommand(new TankDriveToDistance(bot.tankDrive,12,0.5));
         requestOpModeStop();
     }
+
+
 
 
 }

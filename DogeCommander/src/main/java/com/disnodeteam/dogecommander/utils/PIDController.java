@@ -7,7 +7,7 @@ public class PIDController {
     private double kD;
     private double lastTime;
     private int integral = 0;
-    private int previousError = 0;
+    private double previousError = 0;
 
     public PIDController(PIDSettings settings) {
         this.kP = settings.getP();
@@ -20,14 +20,13 @@ public class PIDController {
 
 
 
-    public double run(int targetValue, int position) {
+    public double run(double targetValue, double position) {
         double dt = (System.currentTimeMillis() - lastTime);
         lastTime = System.currentTimeMillis();
 
-        int angleError = (targetValue - position);
-        angleError -= (360*Math.floor(0.5+(((double) angleError)/360.0)));
+        double angleError = (targetValue - position);
 
-        int error = angleError;
+        double error = angleError;
 
         integral += kI * error * dt;
 
