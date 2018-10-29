@@ -1,5 +1,6 @@
 package com.disnodeteam.dogecommander.auto;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.disnodeteam.dogecommander.UniLogger;
 import com.disnodeteam.dogecommander.hardware.DogeBot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -57,6 +58,8 @@ public class DogeCommander {
             UniLogger.Log(TAG, "Running command: " +command.getClass().getSimpleName());
             command.Init(this);
             command.start();
+
+
         }
 
         while(!halt && !getOpModeStop() && isTaskRunningInStack()){

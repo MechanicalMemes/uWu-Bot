@@ -21,7 +21,7 @@ public class TankDriveTurnPID extends DogeCommand {
     public TankDriveTurnPID(TankDriveSubsystem tankDrive, NavigationHardware navSubsystem, double angle, double speed, PIDSettings pidSettings) {
         this.tankDrive = tankDrive;
         this.navigationHardware = navSubsystem;
-        this.angle = angle;
+        this.angle = -angle;
         this.speed = speed;
         this.pidController = new PIDController(pidSettings);
     }
@@ -60,8 +60,8 @@ public class TankDriveTurnPID extends DogeCommand {
         double rightSpeed;
 
         // determine turn power based on +/- error
-        UniLogger.Log("TankDriveTurnPID", "Running Loop: \n\tCurrent:" + heading +"\n\t Target: " + target +"\n\t" );
-        if (Math.abs(heading - target) <= 1) {d
+
+        if (Math.abs(heading - target) <= 0.5) {
             steer = 0.0;
             leftSpeed  = 0.0;
             rightSpeed = 0.0;
@@ -71,10 +71,10 @@ public class TankDriveTurnPID extends DogeCommand {
             double nrmTarget = (AngleUnit.normalizeDegrees(target) / 180);
             double nrmHeading = (AngleUnit.normalizeDegrees(heading) / 180);
             double finalError = pidController.run(nrmTarget,nrmHeading);
-
+            UniLogger.Log("TankDriveTurnPID", "Running Loop: \n\tCurrent:" + nrmHeading +"\n\t Target: " + nrmTarget +"\n\tError: " + finalError );
             steer = Range.clip(finalError, -1, 1);
-            leftSpeed  = speed * steer;
-            rightSpeed   = -leftSpeed;
+            rightSpeed  = speed * steer;
+            leftSpeed   = -rightSpeed;
 
 
         }

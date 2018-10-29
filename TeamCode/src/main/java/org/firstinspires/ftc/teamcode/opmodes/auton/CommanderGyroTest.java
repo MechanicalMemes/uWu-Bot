@@ -29,6 +29,9 @@
 
 package org.firstinspires.ftc.teamcode.opmodes.auton;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.disnodeteam.dogecommander.auto.DogeCommander;
 import com.disnodeteam.dogecommander.examples.commands.TankDriveTurnPID;
 import com.disnodeteam.dogecommander.examples.commands.WaitForTime;
@@ -39,7 +42,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.dogecommander.UWUBot;
 
 @Autonomous(name="Commander Gyro Test", group="DogeCommander")
-
 public class CommanderGyroTest extends LinearOpMode {
 
     private UWUBot bot;
@@ -53,12 +55,20 @@ public class CommanderGyroTest extends LinearOpMode {
 
         waitForStart();
         PIDSettings settings = new PIDSettings();
-        settings.set(0.1,0.1,0.1);
-        commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,90,0.5,settings));
-        commander.runCommand(new WaitForTime(1.0));
-        commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,-90,0.5,settings));
-        commander.runCommand(new WaitForTime(1.0));
-        commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,45,0.5,settings));
+
+        while(opModeIsActive()){
+            settings.set(RobotConstants.TURNING_PID.kP,RobotConstants.TURNING_PID.kI,RobotConstants.TURNING_PID.kD);
+            commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,90,1,settings));
+            commander.runCommand(new WaitForTime(1.0));
+            commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,-90,1,settings));
+            commander.runCommand(new WaitForTime(1.0));
+            commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,0,1,settings));
+            commander.runCommand(new WaitForTime(1.0));
+            commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,179,1,settings));
+
+
+        }
+
         requestOpModeStop();
     }
 

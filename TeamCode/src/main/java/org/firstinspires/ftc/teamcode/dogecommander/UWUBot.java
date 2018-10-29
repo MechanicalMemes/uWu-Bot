@@ -21,6 +21,6 @@ public class UWUBot extends DogeBot {
         addSubsystem(tankDrive);
         addSubsystem(navigationHardware);
 
-        ticksPerInch = (int) ((int)1440 * 3.14 * 4);
+        ticksPerInch = (int) (537.6 /(3.14 * 4));
     }
 }

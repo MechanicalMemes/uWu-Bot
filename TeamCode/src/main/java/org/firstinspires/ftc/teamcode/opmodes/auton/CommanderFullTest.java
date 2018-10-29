@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode.opmodes.auton;
 
-import com.disnodeteam.dogecommander.UniLogger;
 import com.disnodeteam.dogecommander.auto.DogeCommander;
 import com.disnodeteam.dogecommander.examples.commands.TankDriveDistance;
 import com.disnodeteam.dogecommander.examples.commands.TankDriveTurnPID;
@@ -39,29 +38,37 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.dogecommander.UWUBot;
 
-@Autonomous(name="Commander Distance Test", group="DogeCommander")
-
-public class CommanderDistanceTest extends LinearOpMode {
+@Autonomous(name="Commander Full Test", group="DogeCommander")
+public class CommanderFullTest extends LinearOpMode {
 
     private UWUBot bot;
     private DogeCommander commander;
     public void runOpMode() {
 
         bot = new UWUBot(hardwareMap);
-
         commander = new DogeCommander();
         commander.usingLinearOpMode(this);
         commander.setBot(bot);
 
-
         waitForStart();
         PIDSettings settings = new PIDSettings();
-        UniLogger.Log("Doge-Autons", "RobotDrive: " + bot.ticksPerInch);
-        new TankDriveDistance(bot.tankDrive,25,0.8);
+
+        while(opModeIsActive()){
+            settings.set(RobotConstants.TURNING_PID.kP,RobotConstants.TURNING_PID.kI,RobotConstants.TURNING_PID.kD);
+            commander.runCommand(new TankDriveDistance(bot.tankDrive,25,0.8));
+            commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,-90,1.0,settings));
+            commander.runCommand(new TankDriveDistance(bot.tankDrive,12,0.6));
+            commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,-179,1.0,settings));
+            commander.runCommand(new TankDriveDistance(bot.tankDrive,25,0.8));
+            commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,90,1.0,settings));
+            commander.runCommand(new TankDriveDistance(bot.tankDrive,12,0.6));
+            commander.runCommand(new TankDriveTurnPID(bot.tankDrive, bot.navigationHardware,0,1.0,settings));
+
+
+        }
+
         requestOpModeStop();
     }
-
-
 
 
 }

@@ -2,6 +2,7 @@ package com.disnodeteam.dogecommander.examples.subsystems;
 
 import android.graphics.Path;
 
+import com.disnodeteam.dogecommander.UniLogger;
 import com.disnodeteam.dogecommander.auto.DogeCommand;
 import com.disnodeteam.dogecommander.hardware.DogeSubsystem;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,8 +16,8 @@ public class TankDriveSubsystem extends DogeSubsystem {
 
     private double speed = 1.0;
     private DcMotor.RunMode   runMode        = DcMotor.RunMode.RUN_USING_ENCODER;
-    private DcMotor.Direction leftDirection  = DcMotor.Direction.REVERSE;
-    private DcMotor.Direction rightDirection = DcMotor.Direction.FORWARD;
+    private DcMotor.Direction leftDirection  = DcMotor.Direction.FORWARD;
+    private DcMotor.Direction rightDirection = DcMotor.Direction.REVERSE;
     private List<DcMotor> leftMotors  = new ArrayList<>();
     private List<DcMotor> rightMotors = new ArrayList<>();
     private String[] leftMotorNames;
@@ -59,7 +60,15 @@ public class TankDriveSubsystem extends DogeSubsystem {
 
 
     public void setRunMode(DcMotor.RunMode runMode) {
+        UniLogger.Log("DogeCommander-TankDrive", "Setting RunMode: " + runMode.toString());
         this.runMode = runMode;
+        for(DcMotor motor : leftMotors){
+            motor.setMode(runMode);
+        }
+
+        for(DcMotor motor : rightMotors){
+            motor.setMode(runMode);
+        }
     }
 
     public DcMotor.RunMode getRunMode() {
@@ -67,6 +76,8 @@ public class TankDriveSubsystem extends DogeSubsystem {
     }
 
     public void setPower(double left, double right){
+
+
         for(DcMotor motor : leftMotors){
             motor.setPower(left * speed);
         }
@@ -77,6 +88,7 @@ public class TankDriveSubsystem extends DogeSubsystem {
     }
 
     public void setTargetPosition(int left, int right){
+        UniLogger.Log("DogeCommander-TankDrive", "Setting Targets: " + left + "/"+ right);
         for(DcMotor motor : leftMotors){
             motor.setTargetPosition(left + motor.getCurrentPosition());
         }
