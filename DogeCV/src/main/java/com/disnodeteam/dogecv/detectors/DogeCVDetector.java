@@ -7,6 +7,7 @@ import com.disnodeteam.dogecv.scoring.DogeCVScorer;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -26,6 +27,8 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
     private List<DogeCVScorer> scorers = new ArrayList<>();
     private Size initSize;
     private Size adjustedSize;
+    private Rect croppedRect;
+    private boolean crop;
     private Mat workingMat = new Mat();
     public double maxDifference = 10;
 
@@ -36,6 +39,20 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
     protected String detectorName = "DogeCV Detector";
 
     public DogeCVDetector(){
+
+    }
+
+    public void setCrop(Point topLeft, Point bottomRight){
+        croppedRect = new Rect(topLeft, bottomRight);
+        crop = true;
+    }
+
+    public void disableCrop(){
+        crop = false;
+    }
+
+    public void disablePreview(){
+        disable();
 
     }
 
@@ -63,6 +80,8 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
     public Mat processFrame(Mat rgba, Mat gray) {
         initSize = rgba.size();
 
+
+
         if(useFixedDownscale){
             adjustedSize = downscaleResolution;
         }else{
@@ -74,6 +93,10 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
         if(workingMat.empty()){
             return rgba;
         }
+        if(crop){
+            workingMat = new Mat(workingMat.clone(),croppedRect);
+        }
+
         Imgproc.resize(workingMat, workingMat,adjustedSize); // Downscale
         Imgproc.resize(process(workingMat),workingMat,getInitSize()); // Process and scale back to original size for viewing
         //Print Info
@@ -84,6 +107,10 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
 
     public Size getInitSize() {
         return initSize;
+    }
+
+    public Rect getCroppedRect() {
+        return croppedRect;
     }
 
     public Size getAdjustedSize() {
