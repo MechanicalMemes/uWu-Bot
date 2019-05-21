@@ -109,6 +109,7 @@ import org.firstinspires.ftc.robotcore.internal.network.PreferenceRemoterRC;
 import org.firstinspires.ftc.robotcore.internal.network.StartResult;
 import org.firstinspires.ftc.robotcore.internal.network.WifiMuteEvent;
 import org.firstinspires.ftc.robotcore.internal.network.WifiMuteStateMachine;
+import org.firstinspires.ftc.robotcore.internal.opmode.OpModeManagerImpl;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.robotcore.internal.system.Assert;
 import org.firstinspires.ftc.robotcore.internal.system.PreferencesHelper;
@@ -167,6 +168,8 @@ public class FtcRobotControllerActivity extends Activity
 
   protected WifiMuteStateMachine wifiMuteStateMachine;
   protected MotionDetection motionDetection;
+
+    private OpModeManagerImpl opModeManager;
 
   protected class RobotRestarter implements Restarter {
 
@@ -338,6 +341,10 @@ public class FtcRobotControllerActivity extends Activity
       initWifiMute(true);
     }
     FtcDashboard.start();
+
+
+
+
   }
 
   protected UpdateUI createUpdateUI() {
@@ -374,6 +381,10 @@ public class FtcRobotControllerActivity extends Activity
         return false;
       }
     });
+
+
+
+
   }
 
   @Override
@@ -628,6 +639,9 @@ public class FtcRobotControllerActivity extends Activity
     OpModeRegister userOpModeRegister = createOpModeRegister();
     eventLoop = new FtcEventLoop(hardwareFactory, userOpModeRegister, callback, this, programmingModeController);
     FtcEventLoopIdle idleLoop = new FtcEventLoopIdle(hardwareFactory, userOpModeRegister, callback, this, programmingModeController);
+
+
+    eventLoop.getOpModeManager().initActiveOpMode("HybridDNNTest");
 
     controllerService.setCallback(callback);
     controllerService.setupRobot(eventLoop, idleLoop, runOnComplete);

@@ -68,12 +68,21 @@ public abstract class DogeCVDetector extends OpenCVPipeline{
         double totalScore = 0;
 
         for(DogeCVScorer scorer : scorers){
-            totalScore += scorer.calculateScore(input);
+            totalScore += scorer.calculateScore(input, null);
         }
 
         return totalScore;
     }
 
+    public double calculateScore(Mat input, Mat fullImage){
+        double totalScore = 0;
+
+        for(DogeCVScorer scorer : scorers){
+            totalScore += scorer.calculateScore(input, fullImage);
+        }
+
+        return totalScore;
+    }
 
 
     @Override

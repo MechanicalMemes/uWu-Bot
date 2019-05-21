@@ -11,5 +11,6 @@ import java.util.List;
  */
 
 public abstract class DogeCVScorer {
-    public abstract double calculateScore(Mat input);
+
+    public abstract double calculateScore(Mat input, Mat fullImage);
 }

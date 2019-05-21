@@ -21,7 +21,7 @@ public class ColorDevScorer extends DogeCVScorer{
      * @return - Difference from perfect score
      */
     @Override
-    public double calculateScore(Mat input) {
+    public double calculateScore(Mat input, Mat fullImage) {
         Core.meanStdDev(input, mean, std);
         return MathFTC.mean(std.get(0,0));
     }

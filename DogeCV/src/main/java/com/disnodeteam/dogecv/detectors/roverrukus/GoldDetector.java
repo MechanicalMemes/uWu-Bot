@@ -1,11 +1,15 @@
 package com.disnodeteam.dogecv.detectors.roverrukus;
 
+import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 import com.disnodeteam.dogecv.DogeCV;
+import com.disnodeteam.dogecv.ViewDisplay;
 import com.disnodeteam.dogecv.detectors.DogeCVDetector;
 import com.disnodeteam.dogecv.filters.DogeCVColorFilter;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
+import com.disnodeteam.dogecv.scoring.HybridCNNScorer;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
 import com.disnodeteam.dogecv.scoring.PerfectAreaScorer;
 import com.disnodeteam.dogecv.scoring.RatioScorer;
@@ -42,11 +46,13 @@ public class GoldDetector extends DogeCVDetector {
     public DogeCV.AreaScoringMethod areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Setting to decide to use MaxAreaScorer or PerfectAreaScorer
 
     //Create the default filters and scorers
-    public DogeCVColorFilter yellowFilter      = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW); //Default Yellow filter
+    public DogeCVColorFilter yellowFilter      = new LeviColorFilter(LeviColorFilter.ColorPreset.YELLOW,120); //Default Yellow filter
 
     public RatioScorer       ratioScorer       = new RatioScorer(1.0, 3);          // Used to find perfect squares
     public MaxAreaScorer     maxAreaScorer     = new MaxAreaScorer( 0.01);                    // Used to find largest objects
     public PerfectAreaScorer perfectAreaScorer = new PerfectAreaScorer(5000,0.05); // Used to find objects near a tuned area value
+
+    public HybridCNNScorer hybridCNNScorer ;
 
     /**
      * Simple constructor
@@ -54,8 +60,16 @@ public class GoldDetector extends DogeCVDetector {
     public GoldDetector() {
         super();
         detectorName = "Gold Detector"; // Set the detector name
+
     }
 
+    @Override
+    public void init(Context context, ViewDisplay viewDisplay) {
+        super.init(context, viewDisplay);
+
+        hybridCNNScorer = new HybridCNNScorer((Activity)context);
+
+    }
 
     @Override
     public Mat process(Mat input) {
@@ -67,7 +81,7 @@ public class GoldDetector extends DogeCVDetector {
 
 
         //Preprocess the working Mat (blur it then apply a yellow filter)
-        Imgproc.GaussianBlur(workingMat,workingMat,new Size(5,5),0);
+        Imgproc.GaussianBlur(workingMat,workingMat,new Size(3,3),0);
         yellowFilter.process(workingMat.clone(),maskYellow);
 
         //Find contours of the yellow mask and draw them to the display mat for viewing
@@ -82,7 +96,7 @@ public class GoldDetector extends DogeCVDetector {
 
         // Loop through the contours and score them, searching for the best result
         for(MatOfPoint cont : contoursYellow){
-            double score = calculateScore(cont); // Get the diffrence score using the scoring API
+            double score = calculateScore(cont, workingMat); // Get the diffrence score using the scoring API
 
             // Get bounding rect of contour
             Rect rect = Imgproc.boundingRect(cont);
@@ -128,6 +142,8 @@ public class GoldDetector extends DogeCVDetector {
         if (areaScoringMethod == DogeCV.AreaScoringMethod.PERFECT_AREA){
             addScorer(perfectAreaScorer);
         }
+
+        addScorer(hybridCNNScorer);
 
     }
 
